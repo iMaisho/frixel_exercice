@@ -1,0 +1,36 @@
+<.header>
+  Intranet message {@intranet_message.id}
+  <:subtitle>This is a intranet_message record from your database.</:subtitle>
+  <:actions>
+    <.link
+      patch={~p"/intranet_messages/#{@intranet_message}/show/edit"}
+      phx-click={JS.push_focus()}
+    >
+      <.button>Edit intranet_message</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Conversation rattachée">{@intranet_message.intranet_conversation.id}</:item>
+  <:item title="Message body">{@intranet_message.message_body}</:item>
+</.list>
+
+<.back navigate={~p"/intranet_messages"}>Back to intranet_messages</.back>
+
+<.modal
+  :if={@live_action == :edit}
+  id="intranet_message-modal"
+  show
+  on_cancel={JS.patch(~p"/intranet_messages/#{@intranet_message}")}
+>
+  <.live_component
+    module={IgIntranetWeb.IntranetMessageLive.FormComponent}
+    id={@intranet_message.id}
+    title={@page_title}
+    action={@live_action}
+    intranet_message={@intranet_message}
+    intranet_conversations={@intranet_conversations |> Enum.map(&{&1.id, &1.id})}
+    patch={~p"/intranet_messages/#{@intranet_message}"}
+  />
+</.modal>
