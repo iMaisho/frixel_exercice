@@ -19,6 +19,8 @@ defmodule IgIntranetWeb.IntranetConversationLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
+      <.input field={@form[:conversation_topic]} type="text" label="Conversation topic" />
+      
         <.input
           field={@form[:conversation_type]}
           type="select"

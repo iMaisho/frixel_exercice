@@ -11,6 +11,7 @@ defmodule IgIntranet.Chats.IntranetConversation do
   alias IgIntranet.Chats.IntranetMessage
 
   schema "intranet_conversations" do
+    field :conversation_topic, :string
     field :conversation_type, Ecto.Enum, values: [:public, :private]
     field :conversation_status, Ecto.Enum, values: [:active, :archived]
 
@@ -22,7 +23,7 @@ defmodule IgIntranet.Chats.IntranetConversation do
   @doc false
   def changeset(intranet_conversation, attrs) do
     intranet_conversation
-    |> cast(attrs, [:conversation_type, :conversation_status])
-    |> validate_required([:conversation_type, :conversation_status])
+    |> cast(attrs, [:conversation_topic, :conversation_type, :conversation_status])
+    |> validate_required([:conversation_topic, :conversation_type, :conversation_status])
   end
 end
