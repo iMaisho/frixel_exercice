@@ -50,7 +50,6 @@
     intranet_conversations_topic={
       @intranet_conversations |> Enum.map(&{&1.conversation_topic, &1.id})
     }
-    intranet_conversations={@intranet_conversations}
     patch={~p"/intranet_messages"}
   />
 </.modal>

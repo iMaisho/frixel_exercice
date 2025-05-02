@@ -23,7 +23,7 @@ defmodule IgIntranetWeb.IntranetMessageLive.FormComponent do
           field={@form[:intranet_conversation_id]}
           type="select"
           label="Link to conversation"
-          options={@intranet_conversations.conversation_topic}
+          options={@intranet_conversations_topic}
         />
         <.input field={@form[:message_body]} type="text" label="Message body" />
         <:actions>
