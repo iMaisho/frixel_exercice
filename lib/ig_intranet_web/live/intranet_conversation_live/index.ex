@@ -53,11 +53,11 @@ defmodule IgIntranetWeb.IntranetConversationLive.Index do
   end
 
   def handle_event("validate", %{"filter_form" => %{"filter" => value}}, socket) do
-    filtered =
-      socket.assigns.intranet_conversation_list
-      |> Enum.filter(fn conv ->
-        String.contains?(String.downcase(conv.conversation_topic), String.downcase(value))
-      end)
+    filtered = Chats.list_intranet_conversations_filtered(value)
+    # socket.assigns.intranet_conversation_list
+    # |> Enum.filter(fn conv ->
+    #   String.contains?(String.downcase(conv.conversation_topic), String.downcase(value))
+    # end)
 
     {:noreply,
      socket

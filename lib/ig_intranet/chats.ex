@@ -21,6 +21,18 @@ defmodule IgIntranet.Chats do
     Repo.all(IntranetConversation)
   end
 
+  def list_intranet_conversations_filtered(filter) do
+    filter = String.trim(filter)
+
+    from(c in IntranetConversation,
+      where: ilike(c.conversation_topic, ^"%#{filter}%")
+    )
+    |> Repo.all()
+    |> Repo.preload(:intranet_messages)
+  end
+
+  @spec list_intranet_conversation_with_preload() ::
+          nil | [%{optional(atom()) => any()}] | %{optional(atom()) => any()}
   @doc """
   Returns the list of intranet_conversations with the intranet_messages associated.
   ## Examples
