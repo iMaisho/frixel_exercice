@@ -16,7 +16,7 @@
 >
   <:col :let={{_id, intranet_message}} label="Conversation rattachée">
     {intranet_message.intranet_conversation &&
-      "#{intranet_message.intranet_conversation.id}"}
+      "#{intranet_message.intranet_conversation.conversation_topic}"}
   </:col>
   <:col :let={{_id, intranet_message}} label="Message body">{intranet_message.message_body}</:col>
   <:action :let={{_id, intranet_message}}>
@@ -47,7 +47,10 @@
     title={@page_title}
     action={@live_action}
     intranet_message={@intranet_message}
-    intranet_conversations={@intranet_conversations |> Enum.map(&{&1.id, &1.id})}
+    intranet_conversations_topic={
+      @intranet_conversations |> Enum.map(&{&1.conversation_topic, &1.id})
+    }
+    intranet_conversations={@intranet_conversations}
     patch={~p"/intranet_messages"}
   />
 </.modal>
