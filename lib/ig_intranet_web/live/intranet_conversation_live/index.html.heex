@@ -7,7 +7,7 @@
   </:actions>
 </.header>
 <.simple_form for={@form} id="intranet_conversation-filter" phx-change="validate">
-  <.input field={@form[:filter]} type="text" label="Filtrer par mot-clé" />
+  <.input field={@form[:filter]} type="text" label="Search for topic" />
 </.simple_form>
 
 <.table
@@ -28,7 +28,7 @@
   <:col :let={{_id, intranet_conversation}} label="Conversation status">
     {intranet_conversation.conversation_status}
   </:col>
-  <:col :let={{_id, intranet_conversation}} label="Messages associés">
+  <:col :let={{_id, intranet_conversation}} label="Associated Messages">
     <%= if intranet_conversation.intranet_messages != [] do %>
       <ul>
         <%= for intranet_messages <- intranet_conversation.intranet_messages do %>
