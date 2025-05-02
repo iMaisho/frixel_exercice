@@ -61,6 +61,9 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Set french to default locale in gettext
+config :ig_intranet, IgIntranetWeb.Gettext, default_locale: "fr", allowed_locales: ["en", "fr"]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

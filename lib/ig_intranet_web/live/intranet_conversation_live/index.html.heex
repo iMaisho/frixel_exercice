@@ -28,7 +28,7 @@
   <:col :let={{_id, intranet_conversation}} label="Conversation status">
     {intranet_conversation.conversation_status}
   </:col>
-  <:col :let={{_id, intranet_conversation}} label="Associated Messages">
+  <:col :let={{_id, intranet_conversation}} label={gettext("Associated Messages")}>
     <%= if intranet_conversation.intranet_messages != [] do %>
       <ul>
         <%= for intranet_messages <- intranet_conversation.intranet_messages do %>
@@ -36,7 +36,7 @@
         <% end %>
       </ul>
     <% else %>
-      No messages linked to this conversation
+      {gettext("No messages linked to this conversation")}
     <% end %>
   </:col>
   <:action :let={{_id, intranet_conversation}}>
