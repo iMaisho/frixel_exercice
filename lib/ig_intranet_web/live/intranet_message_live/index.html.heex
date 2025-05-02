@@ -14,7 +14,7 @@
     fn {_id, intranet_message} -> JS.navigate(~p"/intranet_messages/#{intranet_message}") end
   }
 >
-  <:col :let={{_id, intranet_message}} label="Conversation rattachée">
+  <:col :let={{_id, intranet_message}} label="Linked conversation">
     {intranet_message.intranet_conversation &&
       "#{intranet_message.intranet_conversation.conversation_topic}"}
   </:col>
