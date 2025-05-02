@@ -24,10 +24,12 @@ defmodule IgIntranet.Chats do
   def list_intranet_conversations_filtered(filter) do
     filter = String.trim(filter)
 
-    from(c in IntranetConversation,
-      where: ilike(c.conversation_topic, ^"%#{filter}%")
-    )
-    |> Repo.all()
+    query =
+      from(c in IntranetConversation,
+        where: ilike(c.conversation_topic, ^"%#{filter}%")
+      )
+
+    Repo.all(query)
     |> Repo.preload(:intranet_messages)
   end
 
