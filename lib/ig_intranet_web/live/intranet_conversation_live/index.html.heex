@@ -6,6 +6,10 @@
     </.link>
   </:actions>
 </.header>
+TODO:
+<.simple_form for={@form} id="intranet_conversation-filter" phx-change="validate">
+  <.input field={@form[:filter]} type="text" label="Filtrer par mot-clé" />
+</.simple_form>
 
 <.table
   id="intranet_conversations"
