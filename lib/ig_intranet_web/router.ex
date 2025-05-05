@@ -8,6 +8,7 @@ defmodule IgIntranetWeb.Router do
     plug :put_root_layout, html: {IgIntranetWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug IgIntranetWeb.Plugs.Locale
   end
 
   pipeline :api do
@@ -18,7 +19,6 @@ defmodule IgIntranetWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-
     # Routes de la live intranet_conversations
     live "/intranet_conversations", IntranetConversationLive.Index, :index
     live "/intranet_conversations/new", IntranetConversationLive.Index, :new
