@@ -61,3 +61,13 @@ msgstr "Messages Associés"
 #, elixir-autogen, elixir-format
 msgid "No messages linked to this conversation"
 msgstr "Aucun message dans cette conversation"
+
+#: lib/ig_intranet_web/controllers/page_html/home.html.heex:59
+#, elixir-autogen, elixir-format
+msgid "Build rich, interactive web applications quickly, with less code and fewer moving parts. Join our growing community of developers using Phoenix to craft APIs, HTML5 apps and more, for fun or at scale."
+msgstr "Honnêtement on se fout un peu de ce qui est écrit ici, le seul but c'est que la traduction s'affiche sans problème"
+
+#: lib/ig_intranet_web/controllers/page_html/home.html.heex:56
+#, elixir-autogen, elixir-format
+msgid "Peace of mind from prototype to production."
+msgstr "Ce message est clairement traduit en Français"

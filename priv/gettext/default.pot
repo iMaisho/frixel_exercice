@@ -61,3 +61,13 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "No messages linked to this conversation"
 msgstr ""
+
+#: lib/ig_intranet_web/controllers/page_html/home.html.heex:59
+#, elixir-autogen, elixir-format
+msgid "Build rich, interactive web applications quickly, with less code and fewer moving parts. Join our growing community of developers using Phoenix to craft APIs, HTML5 apps and more, for fun or at scale."
+msgstr ""
+
+#: lib/ig_intranet_web/controllers/page_html/home.html.heex:56
+#, elixir-autogen, elixir-format
+msgid "Peace of mind from prototype to production."
+msgstr ""
