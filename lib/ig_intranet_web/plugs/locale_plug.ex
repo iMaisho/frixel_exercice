@@ -29,8 +29,8 @@ defmodule IgIntranetWeb.LiveLocale do
 
   # catch-all case
   def on_mount(:default, _params, session, socket) do
-    IO.inspect(session["locale"], label: "session vide ou pas :: ")
     # on récupère l'éventuel choix de langue précédent
+    Gettext.put_locale(IgIntranetWeb.Gettext, session["locale"])
     {:cont, socket}
   end
 end
