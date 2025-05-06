@@ -254,6 +254,9 @@ defmodule IgIntranet.Chats do
 
   @spec flop_list_intranet_messages() :: {:error, Flop.Meta.t()} | {:ok, {list(), Flop.Meta.t()}}
   def flop_list_intranet_messages(params \\ %{}) do
-    Flop.validate_and_run(Repo, params, for: Repo)
+    Flop.validate_and_run(IntranetMessage, params,
+      for: IntranetMessage,
+      replace_invalid_params: true
+    )
   end
 end

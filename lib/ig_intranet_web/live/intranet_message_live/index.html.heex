@@ -7,7 +7,17 @@
   </:actions>
 </.header>
 
-<.table
+<Flop.Phoenix.table items={@messages} meta={@meta} path={~p"/intranet_messages"}>
+  <:col :let={intranet_message} label="Linked conversation">
+    {intranet_message.intranet_conversation &&
+      "#{intranet_message.intranet_conversation_id}"}
+  </:col>
+  <:col :let={intranet_message} label="Message body">{intranet_message.message_body}</:col>
+</Flop.Phoenix.table>
+
+<Flop.Phoenix.pagination meta={@meta} path={~p"/intranet_messages"} />
+
+<%!-- <.table
   id="intranet_messages"
   rows={@streams.intranet_messages}
   row_click={
@@ -33,7 +43,7 @@
       Delete
     </.link>
   </:action>
-</.table>
+</.table> --%>
 
 <.modal
   :if={@live_action in [:new, :edit]}
