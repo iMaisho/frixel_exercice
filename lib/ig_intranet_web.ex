@@ -55,6 +55,7 @@ defmodule IgIntranetWeb do
       use Phoenix.LiveView,
         layout: {IgIntranetWeb.Layouts, :app}
 
+      on_mount IgIntranetWeb.LiveLocale
       unquote(html_helpers())
     end
   end

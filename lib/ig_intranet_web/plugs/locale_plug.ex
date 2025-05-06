@@ -9,8 +9,28 @@ defmodule IgIntranetWeb.Plugs.Locale do
 
   def call(%Plug.Conn{params: %{"locale" => locale}} = conn, _opts) when locale in @locales do
     Gettext.put_locale(IgIntranetWeb.Gettext, locale)
-    conn
+    conn |> put_session(:locale, locale)
   end
 
-  def call(conn, _opts), do: conn
+  def call(conn, _opts) do
+    locale = conn |> get_session(:locale)
+    Gettext.put_locale(IgIntranetWeb.Gettext, locale || "fr")
+    conn
+  end
+end
+
+defmodule IgIntranetWeb.LiveLocale do
+  @locales Gettext.known_locales(IgIntranetWeb.Gettext)
+
+  def on_mount(:default, %{"locale" => locale}, _session, socket) when locale in @locales do
+    Gettext.put_locale(IgIntranetWeb.Gettext, locale)
+    {:cont, socket}
+  end
+
+  # catch-all case
+  def on_mount(:default, _params, session, socket) do
+    IO.inspect(session["locale"], label: "session vide ou pas :: ")
+    # on récupère l'éventuel choix de langue précédent
+    {:cont, socket}
+  end
 end
