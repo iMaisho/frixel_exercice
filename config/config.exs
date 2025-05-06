@@ -67,3 +67,6 @@ config :ig_intranet, IgIntranetWeb.Gettext, default_locale: "en", additionnal_lo
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+
+# Flop config
+config :flop, repo: IgIntranet.Repo
