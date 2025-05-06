@@ -251,4 +251,9 @@ defmodule IgIntranet.Chats do
   def preload_intranet_conversation(intranet_message) do
     Repo.preload(intranet_message, :intranet_conversation)
   end
+
+  @spec flop_list_intranet_messages() :: {:error, Flop.Meta.t()} | {:ok, {list(), Flop.Meta.t()}}
+  def flop_list_intranet_messages(params \\ %{}) do
+    Flop.validate_and_run(Repo, params, for: Repo)
+  end
 end

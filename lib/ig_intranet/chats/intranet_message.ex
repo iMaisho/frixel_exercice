@@ -8,6 +8,11 @@ defmodule IgIntranet.Chats.IntranetMessage do
   import Ecto.Changeset
   alias IgIntranet.Chats.IntranetConversation
 
+  @derive {
+    Flop.Schema,
+    filterable: [:message_body], sortable: [:intranet_conversation_id, :inserted_at]
+  }
+
   schema "intranet_messages" do
     field :message_body, :string
 
