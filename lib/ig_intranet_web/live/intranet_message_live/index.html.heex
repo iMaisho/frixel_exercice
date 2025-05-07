@@ -10,8 +10,8 @@
 <.filter_form fields={[message_body: [op: :ilike]]} meta={@meta} id="messages_filter_form" />
 
 <Flop.Phoenix.table items={@messages} meta={@meta} path={~p"/intranet_messages"}>
-  <:col :let={intranet_message} , field={:id} label="ID">{intranet_message.id}</:col>
-  <:col :let={intranet_message} label="Linked conversation">
+  <:col :let={intranet_message} field={:id} label="ID">{intranet_message.id}</:col>
+  <:col :let={intranet_message} field={:intranet_conversation_id} label="Linked conversation">
     {intranet_message.intranet_conversation &&
       "#{intranet_message.intranet_conversation_id}"}
   </:col>
