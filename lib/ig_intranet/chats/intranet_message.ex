@@ -22,6 +22,20 @@ defmodule IgIntranet.Chats.IntranetMessage do
   end
 
   @doc false
+  @spec changeset(
+          {map(),
+           %{
+             optional(atom()) =>
+               atom()
+               | {:array | :assoc | :embed | :in | :map | :parameterized | :supertype | :try,
+                  any()}
+           }}
+          | %{
+              :__struct__ => atom() | %{:__changeset__ => any(), optional(any()) => any()},
+              optional(atom()) => any()
+            },
+          :invalid | %{optional(:__struct__) => none(), optional(atom() | binary()) => any()}
+        ) :: Ecto.Changeset.t()
   def changeset(intranet_message, attrs) do
     intranet_message
     |> cast(attrs, [:message_body, :intranet_conversation_id])

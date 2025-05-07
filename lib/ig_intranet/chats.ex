@@ -256,7 +256,8 @@ defmodule IgIntranet.Chats do
   def flop_list_intranet_messages(params \\ %{}) do
     Flop.validate_and_run(IntranetMessage, params,
       for: IntranetMessage,
-      replace_invalid_params: true
+      replace_invalid_params: true,
+      default_limit: 5
     )
   end
 end
