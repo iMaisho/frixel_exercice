@@ -10,7 +10,7 @@ defmodule IgIntranet.Chats.IntranetMessage do
 
   @derive {
     Flop.Schema,
-    filterable: [:message_body], sortable: [:intranet_conversation_id, :inserted_at]
+    filterable: [:message_body], sortable: [:id, :inserted_at]
   }
 
   schema "intranet_messages" do
