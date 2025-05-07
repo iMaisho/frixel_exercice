@@ -7,11 +7,19 @@
   </:actions>
 </.header>
 
-<.filter_form fields={[message_body: [op: :ilike]]} meta={@meta} id="messages_filter_form" />
+<.filter_form
+  fields={[message_body: [op: :ilike], conversation_topic: [op: :ilike]]}
+  meta={@meta}
+  id="filter_form"
+/>
 
 <Flop.Phoenix.table items={@messages} meta={@meta} path={~p"/intranet_messages"}>
   <:col :let={intranet_message} field={:id} label="ID">{intranet_message.id}</:col>
-  <:col :let={intranet_message} field={:intranet_conversation_id} label="Linked conversation">
+  <:col :let={intranet_message} field={:conversation_topic} label="Linked conversation topic">
+    {intranet_message.intranet_conversation &&
+      "#{intranet_message.intranet_conversation.conversation_topic}"}
+  </:col>
+  <:col :let={intranet_message} field={:intranet_conversation_id} label="Linked conversation ID">
     {intranet_message.intranet_conversation &&
       "#{intranet_message.intranet_conversation_id}"}
   </:col>
