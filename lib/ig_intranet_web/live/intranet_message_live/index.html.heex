@@ -7,40 +7,16 @@
   </:actions>
 </.header>
 
-<.filter_form
-  fields={[message_body: [op: :ilike], conversation_topic: [op: :ilike]]}
-  meta={@meta}
-  id="filter_form"
-/>
-
-<Flop.Phoenix.table items={@messages} meta={@meta} path={~p"/intranet_messages"}>
-  <:col :let={intranet_message} field={:id} label="ID">{intranet_message.id}</:col>
-  <:col :let={intranet_message} field={:conversation_topic} label="Linked conversation topic">
-    {intranet_message.intranet_conversation &&
-      "#{intranet_message.intranet_conversation.conversation_topic}"}
-  </:col>
-  <:col :let={intranet_message} field={:intranet_conversation_id} label="Linked conversation ID">
-    {intranet_message.intranet_conversation &&
-      "#{intranet_message.intranet_conversation_id}"}
-  </:col>
-  <:col :let={intranet_message} label="Message body">{intranet_message.message_body}</:col>
-  <:col :let={intranet_message} field={:inserted_at} label="Date">
-    {intranet_message.inserted_at}
-  </:col>
-</Flop.Phoenix.table>
-
-<Flop.Phoenix.pagination meta={@meta} path={~p"/intranet_messages"} />
-
-<%!-- <.table
+<.table
   id="intranet_messages"
   rows={@streams.intranet_messages}
   row_click={
     fn {_id, intranet_message} -> JS.navigate(~p"/intranet_messages/#{intranet_message}") end
   }
 >
-  <:col :let={{_id, intranet_message}} label="Linked conversation">
+  <:col :let={{_id, intranet_message}} label="Conversation rattachée">
     {intranet_message.intranet_conversation &&
-      "#{intranet_message.intranet_conversation.conversation_topic}"}
+      "#{intranet_message.intranet_conversation.id}"}
   </:col>
   <:col :let={{_id, intranet_message}} label="Message body">{intranet_message.message_body}</:col>
   <:action :let={{_id, intranet_message}}>
@@ -57,7 +33,7 @@
       Delete
     </.link>
   </:action>
-</.table> --%>
+</.table>
 
 <.modal
   :if={@live_action in [:new, :edit]}
@@ -71,9 +47,7 @@
     title={@page_title}
     action={@live_action}
     intranet_message={@intranet_message}
-    intranet_conversations_topic={
-      @intranet_conversations |> Enum.map(&{&1.conversation_topic, &1.id})
-    }
+    intranet_conversations={@intranet_conversations |> Enum.map(&{&1.id, &1.id})}
     patch={~p"/intranet_messages"}
   />
 </.modal>

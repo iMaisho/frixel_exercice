@@ -1,11 +1,38 @@
 import Config
 
+# env vars
+env_db_user =
+  System.get_env("POSTGRES_USR") ||
+    raise """
+    environment variable POSTGRES_USR is missing.
+    """
+
+env_db_passwd =
+  System.get_env("POSTGRES_PASSWD") ||
+    raise """
+    environment variable POSTGRES_PASSWD is missing.
+    """
+
+env_db_hostname =
+  System.get_env("POSTGRES_HOSTNAME") ||
+    raise """
+    environment variable POSTGRES_HOSTNAME is missing.
+    Example: localhost
+    """
+
+env_db_dbname =
+  System.get_env("POSTGRES_DBNAME") ||
+    raise """
+    environment variable POSTGRES_DBNAME is missing.
+    Example: ig_intranet_dev
+    """
+
 # Configure your database
 config :ig_intranet, IgIntranet.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "ig_intranet_dev",
+  username: env_db_user,
+  password: env_db_passwd,
+  database: env_db_dbname,
+  hostname: env_db_hostname,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

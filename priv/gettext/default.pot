@@ -52,14 +52,9 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: lib/ig_intranet_web/live/intranet_conversation_live/index.html.heex:31
+#: lib/ig_intranet_web/live/intranet_conversation_live/index.html.heex:34
 #, elixir-autogen, elixir-format
-msgid "Associated Messages"
-msgstr ""
-
-#: lib/ig_intranet_web/live/intranet_conversation_live/index.html.heex:39
-#, elixir-autogen, elixir-format
-msgid "No messages linked to this conversation"
+msgid "Conversation topic"
 msgstr ""
 
 #: lib/ig_intranet_web/controllers/page_html/home.html.heex:59
@@ -70,4 +65,9 @@ msgstr ""
 #: lib/ig_intranet_web/controllers/page_html/home.html.heex:56
 #, elixir-autogen, elixir-format
 msgid "Peace of mind from prototype to production."
+msgstr ""
+
+#: lib/ig_intranet_web/components/flop_config.ex:59
+#, elixir-autogen, elixir-format
+msgid "Inserted after"
 msgstr ""

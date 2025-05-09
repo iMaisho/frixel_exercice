@@ -20,17 +20,16 @@ defmodule IgIntranetWeb.IntranetConversationLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:conversation_topic]} type="text" label="Conversation topic" />
-
         <.input
           field={@form[:conversation_type]}
           type="select"
-          options={[:public, :private]}
+          options={Ecto.Enum.values(IgIntranet.Chats.IntranetConversation, :conversation_type)}
           label="Conversation type"
         />
         <.input
           field={@form[:conversation_status]}
           type="select"
-          options={[:active, :archived]}
+          options={Ecto.Enum.values(IgIntranet.Chats.IntranetConversation, :conversation_status)}
           label="Conversation status"
         />
         <:actions>

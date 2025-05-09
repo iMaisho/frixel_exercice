@@ -21,20 +21,6 @@ defmodule IgIntranet.Chats do
     Repo.all(IntranetConversation)
   end
 
-  def list_intranet_conversations_filtered(filter) do
-    filter = String.trim(filter)
-
-    # query =
-    #   from(c in IntranetConversation,
-    #     where: ilike(c.conversation_topic, ^"%#{filter}%")
-    #   )
-
-    IntranetConversation
-    |> where([ic], ilike(ic.conversation_topic, ^"%#{filter}%"))
-    |> Repo.all()
-    |> Repo.preload(:intranet_messages)
-  end
-
   @doc """
   Returns the list of intranet_conversations with the intranet_messages associated.
   ## Examples
@@ -42,8 +28,30 @@ defmodule IgIntranet.Chats do
       [%intranet_conversation{...intranet_message{}}, ...]
   """
   def list_intranet_conversation_with_preload do
-    Repo.all(IntranetConversation)
+    IntranetConversation
+    |> order_by([conv], desc: conv.inserted_at)
+    |> Repo.all()
     |> Repo.preload(:intranet_messages)
+  end
+
+  def list_intranet_conversation_filter_with_preload(filter) do
+    filter = "#{filter}%"
+
+    IntranetConversation
+    |> where([conv], ilike(conv.conversation_topic, ^filter))
+    |> order_by([conv], desc: conv.inserted_at)
+    |> Repo.all()
+    |> Repo.preload(:intranet_messages)
+  end
+
+  def list_conversations_with_flop(params) do
+    IntranetConversation
+    |> join(:left, [ic], im in assoc(ic, :intranet_messages), as: :intranet_messages)
+    |> preload([intranet_messages: im], intranet_messages: im)
+    |> Flop.validate_and_run(params,
+      for: IntranetConversation,
+      replace_invalid_params: true
+    )
   end
 
   @doc """
@@ -250,29 +258,5 @@ defmodule IgIntranet.Chats do
 
   def preload_intranet_conversation(intranet_message) do
     Repo.preload(intranet_message, :intranet_conversation)
-  end
-
-  @spec flop_list_intranet_messages() :: {:error, Flop.Meta.t()} | {:ok, {list(), Flop.Meta.t()}}
-  def flop_list_intranet_messages(params \\ %{}) do
-    base_query =
-      from m in IntranetMessage,
-        preload: [:intranet_conversation]
-
-    Flop.validate_and_run(base_query, params,
-      for: IntranetMessage,
-      replace_invalid_params: true,
-      default_limit: 5
-    )
-  end
-
-  def flop_list_intranet_conversations(params \\ %{}) do
-    IntranetConversation
-    |> join(:left, [c], m in assoc(c, :intranet_messages), as: :intranet_messages)
-    |> preload([intranet_messages: m], intranet_messages: m)
-    |> Flop.validate_and_run(params,
-      for: IntranetConversation,
-      replace_invalid_params: true,
-      default_limit: 5
-    )
   end
 end

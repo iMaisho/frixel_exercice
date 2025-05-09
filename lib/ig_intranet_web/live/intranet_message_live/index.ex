@@ -1,6 +1,5 @@
 defmodule IgIntranetWeb.IntranetMessageLive.Index do
   use IgIntranetWeb, :live_view
-  import Flop.Phoenix
 
   alias IgIntranet.Chats
   alias IgIntranet.Chats.IntranetMessage
@@ -12,12 +11,7 @@ defmodule IgIntranetWeb.IntranetMessageLive.Index do
 
   @impl true
   def handle_params(params, _url, socket) do
-    {:ok, {messages, meta}} = Chats.flop_list_intranet_messages(params)
-
-    {:noreply,
-     socket
-     |> assign(messages: messages, meta: meta)
-     |> apply_action(socket.assigns.live_action, params)}
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -58,32 +52,5 @@ defmodule IgIntranetWeb.IntranetMessageLive.Index do
     {:ok, _} = Chats.delete_intranet_message(intranet_message)
 
     {:noreply, stream_delete(socket, :intranet_messages, intranet_message)}
-  end
-
-  @impl true
-  def handle_event(
-        "update-filter",
-        params,
-        socket
-      ) do
-    {:noreply, push_patch(socket, to: ~p"/intranet_messages?#{params}")}
-  end
-
-  attr :fields, :list, required: true
-  attr :meta, Flop.Meta, required: true
-  attr :id, :string, default: nil
-  attr :on_change, :string, default: "update-filter"
-  attr :target, :string, default: nil
-
-  def filter_form(%{meta: meta} = assigns) do
-    assigns = assign(assigns, form: Phoenix.Component.to_form(meta), meta: nil)
-
-    ~H"""
-    <.form for={@form} id={@id} phx-target={@target} phx-change={@on_change} phx-submit={@on_change}>
-      <.filter_fields :let={i} form={@form} fields={@fields}>
-        <.input field={i.field} label={i.label} type={i.type} phx-debounce={120} {i.rest} />
-      </.filter_fields>
-    </.form>
-    """
   end
 end

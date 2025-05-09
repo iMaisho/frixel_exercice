@@ -1,10 +1,11 @@
+version: "3.8"
 services:
   db:
     image: postgres:14.4
     restart: always
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWD}
+      - POSTGRES_USER=${POSTGRES_USR}
     ports:
       - 5432:5432
     volumes:

@@ -7,83 +7,81 @@
   </:actions>
 </.header>
 
-<.filter_form
-  fields={[conversation_topic: [op: :ilike], message_body: [op: :ilike]]}
+<IgIntranetWeb.Components.FlopConfig.filter_form
+  fields={IgIntranetWeb.Components.FlopConfig.filter_form_fields()}
   meta={@meta}
-  id="filter_form"
+  id="user-filter-form"
 />
-
-<Flop.Phoenix.table items={@conversations} meta={@meta} path={~p"/intranet_conversations"}>
-  <:col :let={conversation} field={:id} label="ID">{conversation.id}</:col>
-  <:col :let={conversation} label="Topic">{conversation.conversation_topic}</:col>
-  <:col :let={conversation} label="Messages">
-    <%= if conversation.intranet_messages != [] do %>
-      <ul>
-        <%= for intranet_messages <- conversation.intranet_messages do %>
-          <li>{intranet_messages.message_body}</li>
-        <% end %>
-      </ul>
-    <% else %>
-      {gettext("No messages linked to this conversation")}
-    <% end %>
-  </:col>
-  <:col :let={conversation} field={:conversation_type} label="Type">
-    {conversation.conversation_type}
-  </:col>
-  <:col :let={conversation} field={:conversation_status} label="Status">
-    {conversation.conversation_status}
-  </:col>
-</Flop.Phoenix.table>
-
-<Flop.Phoenix.pagination meta={@meta} path={~p"/intranet_conversations"} />
-<%!-- <.simple_form for={@form} id="intranet_conversation-filter" phx-change="validate">
-  <.input field={@form[:filter]} type="text" label="Search for topic" />
-</.simple_form> --%>
-
-<%!-- <.table
-  id="intranet_conversations"
-  rows={@streams.intranet_conversations}
-  row_click={
-    fn {_id, intranet_conversation} ->
-      JS.navigate(~p"/intranet_conversations/#{intranet_conversation}")
-    end
-  }
->
-  <:col :let={{_id, intranet_conversation}} label="Conversation topic">
-    {intranet_conversation.conversation_topic}
-  </:col>
-  <:col :let={{_id, intranet_conversation}} label="Conversation type">
-    {intranet_conversation.conversation_type}
-  </:col>
-  <:col :let={{_id, intranet_conversation}} label="Conversation status">
-    {intranet_conversation.conversation_status}
-  </:col>
-  <:col :let={{_id, intranet_conversation}} label={gettext("Associated Messages")}>
-    <%= if intranet_conversation.intranet_messages != [] do %>
-      <ul>
-        <%= for intranet_messages <- intranet_conversation.intranet_messages do %>
-          <li>{intranet_messages.message_body}</li>
-        <% end %>
-      </ul>
-    <% else %>
-      {gettext("No messages linked to this conversation")}
-    <% end %>
-  </:col>
-  <:action :let={{_id, intranet_conversation}}>
-    <div class="sr-only">
-      <.link navigate={~p"/intranet_conversations/#{intranet_conversation}"}>Show</.link>
-    </div>
-    <.link patch={~p"/intranet_conversations/#{intranet_conversation}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, intranet_conversation}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: intranet_conversation.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
+<div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
+  <Flop.Phoenix.table
+    items={@streams.intranet_conversations}
+    meta={@meta}
+    path={~p"/intranet_conversations"}
+    row_click={
+      fn {_id, intranet_conversations} ->
+        JS.navigate(~p"/intranet_conversations/#{intranet_conversations}")
+      end
+    }
+    opts={IgIntranetWeb.Components.FlopConfig.table_opts()}
+  >
+    <:col
+      :let={{_id, intranet_conversation}}
+      field={:inserted_at}
+      label="Date création"
+      col_style="width: 20%"
     >
-      Delete
-    </.link>
-  </:action>
-</.table> --%>
+      {intranet_conversation.inserted_at |> Calendar.strftime("%d-%m-%Y %H:%M:%S")}
+    </:col>
+    <:col
+      :let={{_id, intranet_conversation}}
+      field={:conversation_topic}
+      label={gettext("Conversation topic")}
+    >
+      {intranet_conversation.conversation_topic}
+    </:col>
+    <:col :let={{_id, intranet_conversation}} field={:conversation_type} label="Conversation type">
+      {intranet_conversation.conversation_type}
+    </:col>
+    <:col
+      :let={{_id, intranet_conversation}}
+      field={:conversation_status}
+      label="Conversation status"
+    >
+      {intranet_conversation.conversation_status}
+    </:col>
+    <:col :let={{_id, intranet_conversation}} field={:message_body} label="Messages associés">
+      <%= if intranet_conversation.intranet_messages != [] do %>
+        <ul>
+          <%= for intranet_messages <- intranet_conversation.intranet_messages do %>
+            <li>{intranet_messages.message_body}</li>
+          <% end %>
+        </ul>
+      <% else %>
+        Aucun message rattaché à cette conversation
+      <% end %>
+    </:col>
+    <:action :let={{_id, intranet_conversation}} col_class="relative w-14 p-0">
+      <span class="relative ml-4 font-semibold leading-6 text-zinc-900 hover:text-zinc-700">
+        <.link patch={~p"/intranet_conversations/#{intranet_conversation}/edit"}>Edit</.link>
+      </span>
+    </:action>
+    <:action :let={{id, intranet_conversation}}>
+      <span class="relative ml-4 font-semibold leading-6 text-zinc-900 hover:text-zinc-700">
+        <.link
+          phx-click={JS.push("delete", value: %{id: intranet_conversation.id}) |> hide("##{id}")}
+          data-confirm="Are you sure?"
+        >
+          Delete
+        </.link>
+      </span>
+    </:action>
+  </Flop.Phoenix.table>
+  <Flop.Phoenix.pagination
+    meta={@meta}
+    path={~p"/intranet_conversations"}
+    opts={IgIntranetWeb.Components.FlopConfig.pagination_opts()}
+  />
+</div>
 
 <.modal
   :if={@live_action in [:new, :edit]}

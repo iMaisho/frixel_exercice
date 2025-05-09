@@ -22,6 +22,11 @@ config :ig_intranet, IgIntranetWeb.Endpoint,
   pubsub_server: IgIntranet.PubSub,
   live_view: [signing_salt: "UCo6j/Ve"]
 
+# Specify which languages you support
+# To create .po files for a language run `mix gettext.merge priv/gettext --locale fr`
+# (fr is France, change to whatever language you want - make sure it's included in the locales config below)
+config :ig_intranet, IgIntranetWeb.Gettext, allowed_locales: ~w(en fr), default_locale: "fr"
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
@@ -30,6 +35,8 @@ config :ig_intranet, IgIntranetWeb.Endpoint,
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
 config :ig_intranet, IgIntranet.Mailer, adapter: Swoosh.Adapters.Local
+
+config :flop, repo: IgIntranet.Repo
 
 # Configure esbuild (the version is required)
 config :esbuild,
@@ -61,12 +68,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Gettext configuration
-config :ig_intranet, IgIntranetWeb.Gettext, default_locale: "en", additionnal_locales: ["fr"]
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
-
-# Flop config
-config :flop, repo: IgIntranet.Repo

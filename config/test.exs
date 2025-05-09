@@ -1,14 +1,24 @@
 import Config
 
+# env vars
+env_db_user =
+  System.get_env("POSTGRES_USR") || "postgres"
+
+env_db_passwd =
+  System.get_env("POSTGRES_PASSWD") || "postgres"
+
+env_db_hostname =
+  System.get_env("POSTGRES_HOSTNAME") || "localhost"
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :ig_intranet, IgIntranet.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
+  username: env_db_user,
+  password: env_db_passwd,
+  hostname: env_db_hostname,
   database: "ig_intranet_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2

@@ -32,7 +32,6 @@ defmodule IgIntranet.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:plug, "~> 1.17"},
       {:phoenix, "~> 1.7.18"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
@@ -61,7 +60,7 @@ defmodule IgIntranet.MixProject do
       {:bandit, "~> 1.5"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:flop, "~> 0.26.1"},
-      {:flop_phoenix, "~> 0.25.1"}
+      {:flop_phoenix, "~> 0.24.1"}
     ]
   end
 

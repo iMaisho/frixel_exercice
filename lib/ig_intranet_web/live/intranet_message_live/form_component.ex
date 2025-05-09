@@ -22,8 +22,8 @@ defmodule IgIntranetWeb.IntranetMessageLive.FormComponent do
         <.input
           field={@form[:intranet_conversation_id]}
           type="select"
-          label="Link to conversation"
-          options={@intranet_conversations_topic}
+          label="Conversation rattachée"
+          options={@intranet_conversations}
         />
         <.input field={@form[:message_body]} type="text" label="Message body" />
         <:actions>

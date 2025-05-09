@@ -1,4 +1,7 @@
 defmodule IgIntranetWeb.Router do
+  @moduledoc """
+  Router module.
+  """
   use IgIntranetWeb, :router
 
   pipeline :browser do
@@ -19,6 +22,8 @@ defmodule IgIntranetWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/same_home_but_different", PageController, :home
+
     # Routes de la live intranet_conversations
     live "/intranet_conversations", IntranetConversationLive.Index, :index
     live "/intranet_conversations/new", IntranetConversationLive.Index, :new
@@ -32,6 +37,9 @@ defmodule IgIntranetWeb.Router do
     live "/intranet_messages/:id/edit", IntranetMessageLive.Index, :edit
     live "/intranet_messages/:id", IntranetMessageLive.Show, :show
     live "/intranet_messages/:id/show/edit", IntranetMessageLive.Show, :edit
+
+    # Routes de la live intranet_chat
+    live "/intranet_chat", IntranetChatLive.Index, :index
   end
 
   # Other scopes may use custom stacks.

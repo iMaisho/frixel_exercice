@@ -1,6 +1,4 @@
 <.flash_group flash={@flash} />
-
-
 <div class="left-[40rem] fixed inset-y-0 right-0 z-0 hidden lg:block xl:left-[50rem]">
   <svg
     viewBox="0 0 1480 957"
@@ -54,16 +52,6 @@
         v{Application.spec(:phoenix, :vsn)}
       </small>
     </h1>
-
-    <a href="/?locale=fr">Français</a>
-    <a href="/?locale=en">Anglais</a>
-    <br />
-    <ul>
-      <li><a href="/">route : /home</a></li>
-      <li><a href="/intranet_conversations">route : /intranet_conversations</a></li>
-      <li><a href="/intranet_messages">route : /intranet_messages</a></li>
-    </ul>
-
     <p class="text-[2rem] mt-4 font-semibold leading-10 tracking-tighter text-zinc-900 text-balance">
       {gettext("Peace of mind from prototype to production.")}
     </p>
@@ -72,6 +60,26 @@
         "Build rich, interactive web applications quickly, with less code and fewer moving parts. Join our growing community of developers using Phoenix to craft APIs, HTML5 apps and more, for fun or at scale."
       )}
     </p>
+    <div class="w-full">
+      <nav class="border-b text-sm flex justify-start">
+        <.switch_locale_path
+          locale={:en}
+          language="English"
+          active={Gettext.get_locale(IgIntranetWeb.Gettext) == "en"}
+        />
+        <.switch_locale_path
+          locale={:fr}
+          language="Français"
+          active={Gettext.get_locale(IgIntranetWeb.Gettext) == "fr"}
+        />
+      </nav>
+    </div>
+    <br />
+    <ul>
+      <li><a href={~p"/same_home_but_different"}>route : /home</a></li>
+      <li><a href={~p"/intranet_conversations"}>route : /intranet_conversations</a></li>
+      <li><a href={~p"/intranet_messages"}>route : /intranet_messages</a></li>
+    </ul>
     <div class="flex">
       <div class="w-full sm:w-auto">
         <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">

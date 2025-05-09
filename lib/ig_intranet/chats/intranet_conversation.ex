@@ -12,21 +12,38 @@ defmodule IgIntranet.Chats.IntranetConversation do
 
   @derive {
     Flop.Schema,
-    filterable: [:conversation_topic, :message_body],
-    sortable: [:id, :conversation_type, :conversation_status, :inserted_at],
+    filterable: [
+      :conversation_type,
+      :conversation_status,
+      :conversation_topic,
+      :inserted_at,
+      :updated_at,
+      :message_body
+    ],
+    sortable: [
+      :conversation_type,
+      :conversation_status,
+      :conversation_topic,
+      :inserted_at,
+      :updated_at,
+      :message_body
+    ],
     adapter_opts: [
       join_fields: [
         message_body: [
           binding: :intranet_messages,
-          field: :message_body
+          field: :message_body,
+          ecto_type: :string
         ]
       ]
-    ]
+    ],
+    default_limit: 4
   }
+
   schema "intranet_conversations" do
-    field :conversation_topic, :string
     field :conversation_type, Ecto.Enum, values: [:public, :private]
     field :conversation_status, Ecto.Enum, values: [:active, :archived]
+    field :conversation_topic, :string
 
     has_many(:intranet_messages, IntranetMessage, on_delete: :delete_all)
 
@@ -36,7 +53,8 @@ defmodule IgIntranet.Chats.IntranetConversation do
   @doc false
   def changeset(intranet_conversation, attrs) do
     intranet_conversation
-    |> cast(attrs, [:conversation_topic, :conversation_type, :conversation_status])
-    |> validate_required([:conversation_topic, :conversation_type, :conversation_status])
+    |> cast(attrs, [:conversation_type, :conversation_status, :conversation_topic])
+    |> validate_required([:conversation_type, :conversation_status, :conversation_topic])
+    |> unique_constraint(:conversation_topic)
   end
 end

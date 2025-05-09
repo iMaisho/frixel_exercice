@@ -52,22 +52,22 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: lib/ig_intranet_web/live/intranet_conversation_live/index.html.heex:31
+#: lib/ig_intranet_web/live/intranet_conversation_live/index.html.heex:34
 #, elixir-autogen, elixir-format
-msgid "Associated Messages"
-msgstr "Messages Associés"
-
-#: lib/ig_intranet_web/live/intranet_conversation_live/index.html.heex:39
-#, elixir-autogen, elixir-format
-msgid "No messages linked to this conversation"
-msgstr "Aucun message dans cette conversation"
+msgid "Conversation topic"
+msgstr "Sujet de conversation"
 
 #: lib/ig_intranet_web/controllers/page_html/home.html.heex:59
 #, elixir-autogen, elixir-format
 msgid "Build rich, interactive web applications quickly, with less code and fewer moving parts. Join our growing community of developers using Phoenix to craft APIs, HTML5 apps and more, for fun or at scale."
-msgstr "Honnêtement on se fout un peu de ce qui est écrit ici, le seul but c'est que la traduction s'affiche sans problème"
+msgstr "Construisez des applications web riches, interactives, avec moins de code et moins d'efforts. Rejoignez la communauté grandissante de développeurs utilisant Phoenix pour construire des APIs, applications HTML5, pour le plaisir comme pour des projets d'envergure. "
 
 #: lib/ig_intranet_web/controllers/page_html/home.html.heex:56
 #, elixir-autogen, elixir-format
 msgid "Peace of mind from prototype to production."
-msgstr "Ce message est clairement traduit en Français"
+msgstr "Sérénité, du prototype à la production. "
+
+#: lib/ig_intranet_web/components/flop_config.ex:59
+#, elixir-autogen, elixir-format
+msgid "Inserted after"
+msgstr "Insérée après"
