@@ -6,11 +6,41 @@
     </.link>
   </:actions>
 </.header>
-<.simple_form for={@form} id="intranet_conversation-filter" phx-change="validate">
-  <.input field={@form[:filter]} type="text" label="Search for topic" />
-</.simple_form>
 
-<.table
+<.filter_form
+  fields={[conversation_topic: [op: :ilike], message_body: [op: :ilike]]}
+  meta={@meta}
+  id="filter_form"
+/>
+
+<Flop.Phoenix.table items={@conversations} meta={@meta} path={~p"/intranet_conversations"}>
+  <:col :let={conversation} field={:id} label="ID">{conversation.id}</:col>
+  <:col :let={conversation} label="Topic">{conversation.conversation_topic}</:col>
+  <:col :let={conversation} label="Messages">
+    <%= if conversation.intranet_messages != [] do %>
+      <ul>
+        <%= for intranet_messages <- conversation.intranet_messages do %>
+          <li>{intranet_messages.message_body}</li>
+        <% end %>
+      </ul>
+    <% else %>
+      {gettext("No messages linked to this conversation")}
+    <% end %>
+  </:col>
+  <:col :let={conversation} field={:conversation_type} label="Type">
+    {conversation.conversation_type}
+  </:col>
+  <:col :let={conversation} field={:conversation_status} label="Status">
+    {conversation.conversation_status}
+  </:col>
+</Flop.Phoenix.table>
+
+<Flop.Phoenix.pagination meta={@meta} path={~p"/intranet_conversations"} />
+<%!-- <.simple_form for={@form} id="intranet_conversation-filter" phx-change="validate">
+  <.input field={@form[:filter]} type="text" label="Search for topic" />
+</.simple_form> --%>
+
+<%!-- <.table
   id="intranet_conversations"
   rows={@streams.intranet_conversations}
   row_click={
@@ -53,7 +83,7 @@
       Delete
     </.link>
   </:action>
-</.table>
+</.table> --%>
 
 <.modal
   :if={@live_action in [:new, :edit]}

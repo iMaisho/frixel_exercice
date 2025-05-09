@@ -10,6 +10,19 @@ defmodule IgIntranet.Chats.IntranetConversation do
   import Ecto.Changeset
   alias IgIntranet.Chats.IntranetMessage
 
+  @derive {
+    Flop.Schema,
+    filterable: [:conversation_topic, :message_body],
+    sortable: [:id, :conversation_type, :conversation_status, :inserted_at],
+    adapter_opts: [
+      join_fields: [
+        message_body: [
+          binding: :intranet_messages,
+          field: :message_body
+        ]
+      ]
+    ]
+  }
   schema "intranet_conversations" do
     field :conversation_topic, :string
     field :conversation_type, Ecto.Enum, values: [:public, :private]

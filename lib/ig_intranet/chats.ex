@@ -256,13 +256,21 @@ defmodule IgIntranet.Chats do
   def flop_list_intranet_messages(params \\ %{}) do
     base_query =
       from m in IntranetMessage,
-        as: :intranet_message,
-        join: c in assoc(m, :intranet_conversation),
-        as: :intranet_conversation,
-        preload: [intranet_conversation: c]
+        preload: [:intranet_conversation]
 
     Flop.validate_and_run(base_query, params,
       for: IntranetMessage,
+      replace_invalid_params: true,
+      default_limit: 5
+    )
+  end
+
+  def flop_list_intranet_conversations(params \\ %{}) do
+    IntranetConversation
+    |> join(:left, [c], m in assoc(c, :intranet_messages), as: :intranet_messages)
+    |> preload([intranet_messages: m], intranet_messages: m)
+    |> Flop.validate_and_run(params,
+      for: IntranetConversation,
       replace_invalid_params: true,
       default_limit: 5
     )
