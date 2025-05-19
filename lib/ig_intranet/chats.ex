@@ -7,6 +7,7 @@ defmodule IgIntranet.Chats do
   alias IgIntranet.Repo
 
   alias IgIntranet.Chats.IntranetConversation
+  alias IgIntranet.Chats
 
   @doc """
   Returns the list of intranet_conversations.
@@ -207,6 +208,7 @@ defmodule IgIntranet.Chats do
     %IntranetMessage{}
     |> IntranetMessage.changeset(attrs)
     |> Repo.insert()
+    |> Chats.broadcast(:message_created)
   end
 
   @doc """
@@ -225,6 +227,7 @@ defmodule IgIntranet.Chats do
     intranet_message
     |> IntranetMessage.changeset(attrs)
     |> Repo.update()
+    |> Chats.broadcast(:message_updated)
   end
 
   @doc """
@@ -258,5 +261,16 @@ defmodule IgIntranet.Chats do
 
   def preload_intranet_conversation(intranet_message) do
     Repo.preload(intranet_message, :intranet_conversation)
+  end
+
+  def subscribe() do
+    Phoenix.PubSub.subscribe(IgIntranet.PubSub, "messages")
+  end
+
+  def broadcast({:error, _reason} = error, _event), do: error
+
+  def broadcast({:ok, message}, event) do
+    Phoenix.PubSub.broadcast(IgIntranet.PubSub, "messages", {event, message})
+    {:ok, message}
   end
 end
