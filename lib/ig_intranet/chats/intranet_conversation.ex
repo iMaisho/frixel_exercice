@@ -37,7 +37,7 @@ defmodule IgIntranet.Chats.IntranetConversation do
         ]
       ]
     ],
-    default_limit: 4
+    default_limit: 10
   }
 
   schema "intranet_conversations" do

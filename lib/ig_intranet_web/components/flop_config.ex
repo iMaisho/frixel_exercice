@@ -67,13 +67,13 @@ defmodule IgIntranetWeb.Components.FlopConfig do
     ]
   end
 
-  def select_conversation() do
+  def select_conversation(assigns) do
     [
-
       conversation_topic: [
         type: "select",
         prompt: "",
-        options: @topic_options      ]
+        options: assigns.conversation_topics
+      ]
     ]
   end
 end
