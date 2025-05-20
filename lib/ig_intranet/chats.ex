@@ -30,7 +30,7 @@ defmodule IgIntranet.Chats do
   """
   def list_intranet_conversation_with_preload do
     IntranetConversation
-    |> order_by([conv], desc: conv.inserted_at)
+    |> order_by([conv], asc: conv.inserted_at)
     |> Repo.all()
     |> Repo.preload(:intranet_messages)
   end
@@ -169,6 +169,17 @@ defmodule IgIntranet.Chats do
   def list_intranet_message_with_preload do
     Repo.all(IntranetMessage)
     |> Repo.preload(:intranet_conversation)
+  end
+
+  def list_messages_with_flop(params) do
+    IntranetMessage
+    |> join(:left, [im], ic in assoc(im, :intranet_conversation), as: :intranet_conversations)
+    |> preload([intranet_conversations: ic], intranet_conversation: ic)
+    |> order_by([message], desc: message.inserted_at)
+    |> Flop.validate_and_run(params,
+      for: IntranetMessage,
+      replace_invalid_params: true
+    )
   end
 
   @doc """
