@@ -6,7 +6,9 @@ defmodule IgIntranet.Chats.IntranetMessage do
 
   use Ecto.Schema
   import Ecto.Changeset
+  alias Hex.API.User
   alias IgIntranet.Chats.IntranetConversation
+  alias IgIntranet.Accounts.User
 
   @derive {
     Flop.Schema,
@@ -29,6 +31,7 @@ defmodule IgIntranet.Chats.IntranetMessage do
     field :message_body, :string
 
     belongs_to(:intranet_conversation, IntranetConversation)
+    belongs_to(:user, User)
 
     timestamps(type: :utc_datetime)
   end
@@ -36,7 +39,7 @@ defmodule IgIntranet.Chats.IntranetMessage do
   @doc false
   def changeset(intranet_message, attrs) do
     intranet_message
-    |> cast(attrs, [:message_body, :intranet_conversation_id])
-    |> validate_required([:message_body, :intranet_conversation_id])
+    |> cast(attrs, [:message_body, :intranet_conversation_id, :author_id])
+    |> validate_required([:message_body, :intranet_conversation_id, :author_id])
   end
 end
