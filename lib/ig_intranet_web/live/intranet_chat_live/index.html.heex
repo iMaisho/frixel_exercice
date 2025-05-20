@@ -5,29 +5,39 @@
     meta={@meta}
     id="user-filter-form"
   />
+  <:actions>
+    <.link patch={~p"/intranet_chat/new"}>
+      <.button>New Message</.button>
+    </.link>
+  </:actions>
 </.header>
 
-<div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
-  <Flop.Phoenix.table
-    items={@intranet_messages}
-    meta={@meta}
-    path={~p"/intranet_chat"}
-    opts={IgIntranetWeb.Components.FlopConfig.table_opts()}
-  >
-    <:col :let={intranet_message} field={:message_body} label="Messages">
-      <div style="display:flex; flex-direction:row; justify-content:space-between; margin:40px; position:relative; border-radius:10px; padding:10px 20px; background-color:lightblue;">
-        <div style="font-size:14px; padding:10px; padding-bottom:20px">
-          {intranet_message.message_body}
-        </div>
-        <div style="position:absolute; bottom:10px; right:10px; font-size:10px">
-          {Calendar.strftime(intranet_message.inserted_at, "%d/%m - %H:%M")}
-        </div>
+<.table id="intranet_messages" rows={@intranet_messages}>
+  <:col :let={intranet_message} label="Messages">
+    <div style="display:flex; flex-direction:row; justify-content:space-between; position:relative; border-radius:10px; padding:10px 20px; background-color:lightblue;">
+      <div style="font-size:14px; padding:10px; padding-bottom:20px">
+        {intranet_message.message_body}
       </div>
-    </:col>
-  </Flop.Phoenix.table>
-  <Flop.Phoenix.pagination
-    meta={@meta}
-    path={~p"/intranet_chat"}
-    opts={IgIntranetWeb.Components.FlopConfig.pagination_opts()}
+      <div style="position:absolute; bottom:10px; right:10px; font-size:10px">
+        {Calendar.strftime(intranet_message.inserted_at, "%d/%m - %H:%M")}
+      </div>
+    </div>
+  </:col>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="intranet_message-modal"
+  show
+  on_cancel={JS.patch(~p"/intranet_chat")}
+>
+  <.live_component
+    module={IgIntranetWeb.IntranetMessageLive.FormComponent}
+    id={@intranet_message.id || :new}
+    title={@page_title}
+    action={@live_action}
+    intranet_message={@intranet_message}
+    intranet_conversations={@intranet_conversations |> Enum.map(&{&1.conversation_topic, &1.id})}
+    patch={~p"/intranet_chat"}
   />
-</div>
+</.modal>

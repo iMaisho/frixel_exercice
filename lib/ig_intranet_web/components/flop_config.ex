@@ -2,6 +2,10 @@ defmodule IgIntranetWeb.Components.FlopConfig do
   @moduledoc """
   Flop Config component Module
   """
+
+  alias IgIntranet.Chats
+  alias IgIntranet.Chats.IntranetConversation
+
   def table_opts do
     [
       table_attrs: [class: "w-[40rem] mt-11 sm:w-full"],
@@ -67,12 +71,13 @@ defmodule IgIntranetWeb.Components.FlopConfig do
     ]
   end
 
-  def select_conversation(assigns) do
+  def select_conversation() do
     [
-      conversation_topic: [
+      conversation_id: [
         type: "select",
-        prompt: "",
-        options: assigns.conversation_topics
+        options:
+          Chats.list_intranet_conversation_with_preload()
+          |> Enum.map(fn conversation -> {conversation.id, conversation.conversation_topic} end)
       ]
     ]
   end
