@@ -39,7 +39,7 @@ defmodule IgIntranet.Chats.IntranetMessage do
   @doc false
   def changeset(intranet_message, attrs) do
     intranet_message
-    |> cast(attrs, [:message_body, :intranet_conversation_id, :author_id])
-    |> validate_required([:message_body, :intranet_conversation_id, :author_id])
+    |> cast(attrs, [:message_body, :intranet_conversation_id, :user_id])
+    |> validate_required([:message_body, :intranet_conversation_id])
   end
 end

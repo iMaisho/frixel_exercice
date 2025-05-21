@@ -1,10 +1,6 @@
 <.header>
   Select a conversation
-  <IgIntranetWeb.Components.FlopConfig.filter_form
-    fields={IgIntranetWeb.Components.FlopConfig.select_conversation()}
-    meta={@meta}
-    id="user-filter-form"
-  />
+
   <:actions>
     <.link patch={~p"/intranet_chat/new"}>
       <.button>New Message</.button>
@@ -38,6 +34,7 @@
     action={@live_action}
     intranet_message={@intranet_message}
     intranet_conversations={@intranet_conversations |> Enum.map(&{&1.conversation_topic, &1.id})}
+    user_id={assigns.current_user.id}
     patch={~p"/intranet_chat"}
   />
 </.modal>

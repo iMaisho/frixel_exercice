@@ -167,8 +167,11 @@ defmodule IgIntranet.Chats do
       [%list_intranet_message{...intranet_message{}}, ...]
   """
   def list_intranet_message_with_preload do
-    Repo.all(IntranetMessage)
+    IntranetMessage
+    |> order_by([message], desc: message.inserted_at)
+    |> Repo.all()
     |> Repo.preload(:intranet_conversation)
+    |> Repo.preload(:user)
   end
 
   def list_messages_with_flop(params) do

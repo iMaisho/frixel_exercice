@@ -18,7 +18,7 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
     #   |> assign(:meta, meta)
     # }
     if connected?(socket), do: Chats.subscribe()
-    {:ok, socket}
+    {:ok, socket |> assign(:intranet_messages, Chats.list_intranet_message_with_preload())}
   end
 
   @impl true
@@ -28,11 +28,10 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
      |> apply_action(socket.assigns.live_action, params)}
   end
 
-  defp apply_action(socket, :index, params) do
-    {:ok, {intranet_messages, meta}} = Chats.list_messages_with_flop(params)
+  defp apply_action(socket, :index, _params) do
+    intranet_messages = Chats.list_intranet_message_with_preload()
 
     socket
-    |> assign(:meta, meta)
     |> assign(:intranet_messages, intranet_messages)
   end
 
@@ -51,15 +50,21 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
       [message | socket.assigns.intranet_messages]
       |> Enum.uniq_by(& &1.id)
 
-    {:noreply, assign(socket, :intranet_messages, updated)}
+    {:noreply, socket |> assign(:intranet_messages, updated)}
   end
 
   @impl true
   def handle_info(
-        {IgIntranetWeb.IntranetMessageLive.FormComponent, {:saved, _intranet_message}},
+        {IgIntranetWeb.IntranetMessageLive.FormComponent, {:saved, intranet_message}},
         socket
       ) do
-    {:noreply, socket}
+    if(socket.assigns.current_user.id == intranet_message.user_id) do
+      {:noreply, socket}
+    else
+      {:noreply,
+       socket
+       |> assign(:intranet_messages, intranet_message)}
+    end
   end
 
   @impl true

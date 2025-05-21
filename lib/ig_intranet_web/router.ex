@@ -26,24 +26,6 @@ defmodule IgIntranetWeb.Router do
 
     get "/", PageController, :home
     get "/same_home_but_different", PageController, :home
-
-    # Routes de la live intranet_conversations
-    live "/intranet_conversations", IntranetConversationLive.Index, :index
-    live "/intranet_conversations/new", IntranetConversationLive.Index, :new
-    live "/intranet_conversations/:id/edit", IntranetConversationLive.Index, :edit
-    live "/intranet_conversations/:id", IntranetConversationLive.Show, :show
-    live "/intranet_conversations/:id/show/edit", IntranetConversationLive.Show, :edit
-
-    # Routes de la live intranet_messages
-    live "/intranet_messages", IntranetMessageLive.Index, :index
-    live "/intranet_messages/new", IntranetMessageLive.Index, :new
-    live "/intranet_messages/:id/edit", IntranetMessageLive.Index, :edit
-    live "/intranet_messages/:id", IntranetMessageLive.Show, :show
-    live "/intranet_messages/:id/show/edit", IntranetMessageLive.Show, :edit
-
-    # Routes de la live intranet_chat
-    live "/intranet_chat", IntranetChatLive.Index, :index
-    live "/intranet_chat/new", IntranetChatLive.Index, :new
   end
 
   # Other scopes may use custom stacks.
@@ -103,6 +85,24 @@ defmodule IgIntranetWeb.Router do
       on_mount: [{IgIntranetWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+
+      # Routes de la live intranet_conversations
+      live "/intranet_conversations", IntranetConversationLive.Index, :index
+      live "/intranet_conversations/new", IntranetConversationLive.Index, :new
+      live "/intranet_conversations/:id/edit", IntranetConversationLive.Index, :edit
+      live "/intranet_conversations/:id", IntranetConversationLive.Show, :show
+      live "/intranet_conversations/:id/show/edit", IntranetConversationLive.Show, :edit
+
+      # Routes de la live intranet_messages
+      live "/intranet_messages", IntranetMessageLive.Index, :index
+      live "/intranet_messages/new", IntranetMessageLive.Index, :new
+      live "/intranet_messages/:id/edit", IntranetMessageLive.Index, :edit
+      live "/intranet_messages/:id", IntranetMessageLive.Show, :show
+      live "/intranet_messages/:id/show/edit", IntranetMessageLive.Show, :edit
+
+      # Routes de la live intranet_chat
+      live "/intranet_chat", IntranetChatLive.Index, :index
+      live "/intranet_chat/new", IntranetChatLive.Index, :new
     end
   end
 end

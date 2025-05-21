@@ -29,6 +29,7 @@ defmodule IgIntranetWeb.IntranetMessageLive.FormComponent do
         <:actions>
           <.button phx-disable-with="Saving...">Save Intranet message</.button>
         </:actions>
+        <.input field={@form[:user_id]} type="hidden" value={@user_id} />
       </.simple_form>
     </div>
     """
