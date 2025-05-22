@@ -1,12 +1,11 @@
 <.header>
-  Select a conversation
   <.simple_form id="intranet_chat-form" phx-change="filter" for={@filter_form}>
     <.input
       type="select"
       label="Conversation"
       name="current_conversation_id"
       options={
-        [{"Sélectionner une conversation", 0}] ++
+        [{"Select a conversation", 0}] ++
           Enum.map(@intranet_conversations, &{&1.conversation_topic, &1.id})
       }
       value=""
@@ -15,13 +14,10 @@
 </.header>
 
 <%= if ((@current_conversation_id == 0) || (@current_conversation_id == "0")) do %>
-  <div>
-    Choisissez une conversation pour afficher les messages : {@current_conversation_id}
-  </div>
 <% else %>
   <.live_component
     module={IgIntranetWeb.IntranetChatLive.FormComponent}
-    id={:new}
+    id="send_message"
     action={:new}
     intranet_message={%IgIntranet.Chats.IntranetMessage{}}
     current_conversation_id={@current_conversation_id}

@@ -9,7 +9,7 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
     new_socket =
       socket
       |> assign(:intranet_messages, Chats.list_intranet_message_with_preload())
-      |> assign(:intranet_conversations, Chats.list_intranet_conversation_with_preload())
+      |> assign(:intranet_conversations, Chats.list_intranet_conversations())
       |> assign(:filter_form, %{})
       |> assign(:current_conversation_id, 0)
 
@@ -33,11 +33,7 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
   end
 
   defp apply_action(socket, :new, _params) do
-    intranet_conversations = Chats.list_intranet_conversation_with_preload()
-
     socket
-    |> assign(:page_title, "New Intranet message")
-    |> assign(:intranet_conversations, intranet_conversations)
     |> assign(:intranet_message, %IntranetMessage{})
   end
 
@@ -70,8 +66,6 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
   def handle_event("filter", %{"current_conversation_id" => id}, socket) do
     intranet_messages =
       Chats.list_intranet_message_by_conversation_id(id)
-
-    IO.inspect(id, label: "✅ current_conversation assigné")
 
     {:noreply,
      socket

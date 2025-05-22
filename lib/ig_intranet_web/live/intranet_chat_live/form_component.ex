@@ -8,7 +8,6 @@ defmodule IgIntranetWeb.IntranetChatLive.FormComponent do
     ~H"""
     <div>
       <.simple_form
-        style="display:flex; flex-direction:column; color:red; "
         for={@form}
         id="intranet_message-form"
         phx-target={@myself}
