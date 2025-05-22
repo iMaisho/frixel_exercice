@@ -31,7 +31,8 @@ defmodule IgIntranet.Chats.IntranetMessage do
     field :message_body, :string
 
     belongs_to(:intranet_conversation, IntranetConversation)
-    belongs_to(:user, User)
+    belongs_to(:sender, User, foreign_key: :sender_id)
+    belongs_to(:recipient, User, foreign_key: :recipient_id)
 
     timestamps(type: :utc_datetime)
   end
@@ -39,7 +40,7 @@ defmodule IgIntranet.Chats.IntranetMessage do
   @doc false
   def changeset(intranet_message, attrs) do
     intranet_message
-    |> cast(attrs, [:message_body, :intranet_conversation_id, :user_id])
-    |> validate_required([:message_body, :intranet_conversation_id])
+    |> cast(attrs, [:message_body, :intranet_conversation_id, :sender_id, :recipient_id])
+    |> validate_required([:message_body, :intranet_conversation_id, :sender_id, :recipient_id])
   end
 end
