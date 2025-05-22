@@ -6,16 +6,16 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    new_socket =
+      socket
+      |> assign(:intranet_messages, Chats.list_intranet_message_with_preload())
+      |> assign(:intranet_conversations, Chats.list_intranet_conversation_with_preload())
+      |> assign(:filter_form, %{})
+      |> assign(:current_conversation_id, 0)
+
     if connected?(socket), do: Chats.subscribe()
 
-    {:ok,
-     socket
-     |> assign(
-       :intranet_messages,
-       Chats.list_intranet_message_with_preload()
-     )
-     |> assign(:intranet_conversations, Chats.list_intranet_conversation_with_preload())
-     |> assign(:filter_form, %{})}
+    {:ok, new_socket}
   end
 
   @impl true
@@ -26,10 +26,10 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
   end
 
   defp apply_action(socket, :index, _params) do
-    intranet_messages = Chats.list_intranet_message_with_preload()
+    intranet_messages =
+      Chats.list_intranet_message_by_conversation_id(socket.assigns.current_conversation_id)
 
-    socket
-    |> assign(:intranet_messages, intranet_messages)
+    socket |> assign(:intranet_messages, intranet_messages)
   end
 
   defp apply_action(socket, :new, _params) do
@@ -43,11 +43,10 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
 
   @impl true
   def handle_info({:message_created, message}, socket) do
-    updated =
-      [message | socket.assigns.intranet_messages]
-      |> Enum.uniq_by(& &1.id)
+    intranet_messages =
+      Chats.list_intranet_message_by_conversation_id(socket.assigns.current_conversation_id)
 
-    {:noreply, socket |> assign(:intranet_messages, updated)}
+    {:noreply, socket |> assign(:intranet_messages, intranet_messages)}
   end
 
   @impl true
@@ -55,7 +54,10 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
         {IgIntranetWeb.IntranetMessageLive.FormComponent, {:saved, intranet_message}},
         socket
       ) do
-    if(socket.assigns.current_user.id == intranet_message.sender_id) do
+    if(
+      socket.assigns.current_user.id == intranet_message.sender_id ||
+        socket.assigns.current_conversation_id != intranet_message.intranet_conversation_id
+    ) do
       {:noreply, socket}
     else
       {:noreply,
@@ -65,15 +67,15 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
   end
 
   @impl true
-  def handle_event("update-filter", params, socket) do
-    params = Map.delete(params, "_target")
-    {:noreply, push_patch(socket, to: ~p"/intranet_chat?#{params}")}
-  end
-
   def handle_event("filter", %{"current_conversation" => id}, socket) do
     intranet_messages =
       Chats.list_intranet_message_by_conversation_id(id)
 
-    {:noreply, socket |> assign(:intranet_messages, intranet_messages)}
+    IO.inspect(id, label: "✅ current_conversation assigné")
+
+    {:noreply,
+     socket
+     |> assign(:intranet_messages, intranet_messages)
+     |> assign(:current_conversation_id, id)}
   end
 end

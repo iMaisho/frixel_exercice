@@ -177,7 +177,8 @@ defmodule IgIntranet.Chats do
 
   def list_intranet_message_by_conversation_id(id) do
     IntranetMessage
-    |> where([message], message.intranet_conversation_id == ^id)
+    |> where([m], m.intranet_conversation_id == ^id)
+    |> order_by([m], desc: m.inserted_at)
     |> Repo.all()
   end
 
