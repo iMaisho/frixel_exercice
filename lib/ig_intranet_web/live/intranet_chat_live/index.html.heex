@@ -4,7 +4,7 @@
     <.input
       type="select"
       label="Conversation"
-      name="current_conversation"
+      name="current_conversation_id"
       options={
         [{"Sélectionner une conversation", 0}] ++
           Enum.map(@intranet_conversations, &{&1.conversation_topic, &1.id})
@@ -12,22 +12,26 @@
       value=""
     />
   </.simple_form>
-
-  <:actions>
-    <.link patch={~p"/intranet_chat/new"}>
-      <.button>New Message</.button>
-    </.link>
-  </:actions>
 </.header>
-<%= if assigns.current_conversation_id == 0 do %>
+
+<%= if ((@current_conversation_id == 0) || (@current_conversation_id == "0")) do %>
   <div>
-    Choisissez une conversation pour afficher les messages : {assigns.current_conversation_id}
+    Choisissez une conversation pour afficher les messages : {@current_conversation_id}
   </div>
 <% else %>
-  {assigns.current_conversation_id}
+  <.live_component
+    module={IgIntranetWeb.IntranetChatLive.FormComponent}
+    id={:new}
+    action={:new}
+    intranet_message={%IgIntranet.Chats.IntranetMessage{}}
+    current_conversation_id={@current_conversation_id}
+    sender_id={@current_user.id}
+    recipient_id={1}
+    patch={~p"/intranet_chat"}
+  />
   <.table id="intranet_messages" rows={@intranet_messages}>
     <:col :let={intranet_message} label="Messages">
-      <%= if(assigns.current_user && assigns.current_user.id == intranet_message.sender_id) do %>
+      <%= if(@current_user && @current_user.id == intranet_message.sender_id) do %>
         <div style="display:flex; flex-direction:row; justify-content:space-between; position:relative; border-radius:10px; padding:10px 20px; background-color:lightblue;">
           <div style="font-size:14px; padding:10px; padding-bottom:20px">
             {intranet_message.message_body}
@@ -49,21 +53,3 @@
     </:col>
   </.table>
 <% end %>
-<.modal
-  :if={@live_action in [:new, :edit]}
-  id="intranet_message-modal"
-  show
-  on_cancel={JS.patch(~p"/intranet_chat")}
->
-  <.live_component
-    module={IgIntranetWeb.IntranetMessageLive.FormComponent}
-    id={@intranet_message.id || :new}
-    title={@page_title}
-    action={@live_action}
-    intranet_message={@intranet_message}
-    intranet_conversations={@intranet_conversations |> Enum.map(&{&1.conversation_topic, &1.id})}
-    sender_id={assigns.current_user.id}
-    recipient_id={1}
-    patch={~p"/intranet_chat"}
-  />
-</.modal>

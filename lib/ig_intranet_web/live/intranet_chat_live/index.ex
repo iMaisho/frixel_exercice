@@ -42,7 +42,7 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
   end
 
   @impl true
-  def handle_info({:message_created, message}, socket) do
+  def handle_info({:message_created, _message}, socket) do
     intranet_messages =
       Chats.list_intranet_message_by_conversation_id(socket.assigns.current_conversation_id)
 
@@ -67,7 +67,7 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
   end
 
   @impl true
-  def handle_event("filter", %{"current_conversation" => id}, socket) do
+  def handle_event("filter", %{"current_conversation_id" => id}, socket) do
     intranet_messages =
       Chats.list_intranet_message_by_conversation_id(id)
 

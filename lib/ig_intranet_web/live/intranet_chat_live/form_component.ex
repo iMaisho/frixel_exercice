@@ -7,97 +7,54 @@ defmodule IgIntranetWeb.IntranetChatLive.FormComponent do
   def render(assigns) do
     ~H"""
     <div>
-      <.header>
-        {@title}
-        <:subtitle>Use this form to manage intranet_conversation records in your database.</:subtitle>
-      </.header>
-
       <.simple_form
+        style="display:flex; flex-direction:column; color:red; "
         for={@form}
-        id="intranet_conversation-form"
+        id="intranet_message-form"
         phx-target={@myself}
-        phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:conversation_topic]} type="text" label="Conversation topic" />
+        <.input field={@form[:message_body]} type="text" placeholder="Send a message here" />
 
         <.input
-          field={@form[:conversation_type]}
-          type="select"
-          options={[:public, :private]}
-          label="Conversation type"
+          field={@form[:intranet_conversation_id]}
+          type="hidden"
+          value={@current_conversation_id}
         />
-        <.input
-          field={@form[:conversation_status]}
-          type="select"
-          options={[:active, :archived]}
-          label="Conversation status"
-        />
-        <:actions>
-          <.button phx-disable-with="Saving...">Save Intranet conversation</.button>
-        </:actions>
+
+        <.input field={@form[:sender_id]} type="hidden" value={@sender_id} />
+        <.input field={@form[:recipient_id]} type="hidden" value={@recipient_id} />
       </.simple_form>
     </div>
     """
   end
 
   @impl true
-  def update(%{intranet_conversation: intranet_conversation} = assigns, socket) do
+  def update(%{intranet_message: intranet_message} = assigns, socket) do
     {:ok,
      socket
      |> assign(assigns)
      |> assign_new(:form, fn ->
-       to_form(Chats.change_intranet_conversation(intranet_conversation))
+       to_form(Chats.change_intranet_message(intranet_message))
      end)}
   end
 
   @impl true
-  def handle_event("validate", %{"intranet_conversation" => intranet_conversation_params}, socket) do
-    changeset =
-      Chats.change_intranet_conversation(
-        socket.assigns.intranet_conversation,
-        intranet_conversation_params
-      )
 
-    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+  def handle_event("save", %{"intranet_message" => intranet_message_params}, socket) do
+    save_intranet_message(socket, socket.assigns.action, intranet_message_params)
   end
 
-  def handle_event("save", %{"intranet_conversation" => intranet_conversation_params}, socket) do
-    save_intranet_conversation(socket, socket.assigns.action, intranet_conversation_params)
-  end
-
-  defp save_intranet_conversation(socket, :edit, intranet_conversation_params) do
-    case Chats.update_intranet_conversation(
-           socket.assigns.intranet_conversation,
-           intranet_conversation_params
-         ) do
-      {:ok, intranet_conversation} ->
-        notify_parent({:saved, intranet_conversation})
-
+  defp save_intranet_message(socket, :new, intranet_message_params) do
+    case Chats.create_intranet_message(intranet_message_params) do
+      {:ok, _intranet_message} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Intranet conversation updated successfully")
+         |> put_flash(:info, "Message sent")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
-
-  defp save_intranet_conversation(socket, :new, intranet_conversation_params) do
-    case Chats.create_intranet_conversation(intranet_conversation_params) do
-      {:ok, intranet_conversation} ->
-        notify_parent({:saved, intranet_conversation |> Chats.preload_intranet_messages()})
-
-        {:noreply,
-         socket
-         |> put_flash(:info, "Intranet conversation created successfully")
-         |> push_patch(to: socket.assigns.patch)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
-    end
-  end
-
-  defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end
