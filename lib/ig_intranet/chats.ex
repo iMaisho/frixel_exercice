@@ -171,7 +171,14 @@ defmodule IgIntranet.Chats do
     |> order_by([message], desc: message.inserted_at)
     |> Repo.all()
     |> Repo.preload(:intranet_conversation)
-    |> Repo.preload(:user)
+    |> Repo.preload(:sender)
+    |> Repo.preload(:recipient)
+  end
+
+  def list_intranet_message_by_conversation_id(id) do
+    IntranetMessage
+    |> where([message], message.intranet_conversation_id == ^id)
+    |> Repo.all()
   end
 
   def list_messages_with_flop(params) do

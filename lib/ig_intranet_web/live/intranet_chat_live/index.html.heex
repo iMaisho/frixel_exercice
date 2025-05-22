@@ -1,5 +1,15 @@
 <.header>
   Select a conversation
+  <.simple_form id="intranet_chat-form" phx-change="filter" for={@filter_form}>
+    <.input
+      type="select"
+      label="Conversation"
+      name= "current_conversation"
+      options={@intranet_conversations |> Enum.map(&{&1.conversation_topic, &1.id})}
+      value=""
+    />
+  </.simple_form>
+
   <:actions>
     <.link patch={~p"/intranet_chat/new"}>
       <.button>New Message</.button>
@@ -9,7 +19,7 @@
 
 <.table id="intranet_messages" rows={@intranet_messages}>
   <:col :let={intranet_message} label="Messages">
-    <%= if(assigns.current_user && assigns.current_user.id == intranet_message.user_id) do %>
+    <%= if(assigns.current_user && assigns.current_user.id == intranet_message.sender_id) do %>
       <div style="display:flex; flex-direction:row; justify-content:space-between; position:relative; border-radius:10px; padding:10px 20px; background-color:lightblue;">
         <div style="font-size:14px; padding:10px; padding-bottom:20px">
           {intranet_message.message_body}
@@ -44,7 +54,8 @@
     action={@live_action}
     intranet_message={@intranet_message}
     intranet_conversations={@intranet_conversations |> Enum.map(&{&1.conversation_topic, &1.id})}
-    user_id={assigns.current_user.id}
+    sender_id={assigns.current_user.id}
+    recipient_id={1}
     patch={~p"/intranet_chat"}
   />
 </.modal>
