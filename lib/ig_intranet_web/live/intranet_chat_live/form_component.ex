@@ -7,12 +7,7 @@ defmodule IgIntranetWeb.IntranetChatLive.FormComponent do
   def render(assigns) do
     ~H"""
     <div>
-      <.simple_form
-        for={@form}
-        id="intranet_message-form"
-        phx-target={@myself}
-        phx-submit="save"
-      >
+      <.simple_form for={@form} id="intranet_message-form" phx-target={@myself} phx-submit="save">
         <.input field={@form[:message_body]} type="text" placeholder="Send a message here" />
 
         <.input
@@ -20,7 +15,6 @@ defmodule IgIntranetWeb.IntranetChatLive.FormComponent do
           type="hidden"
           value={@current_conversation_id}
         />
-
         <.input field={@form[:sender_id]} type="hidden" value={@sender_id} />
         <.input field={@form[:recipient_id]} type="hidden" value={@recipient_id} />
       </.simple_form>
@@ -51,7 +45,7 @@ defmodule IgIntranetWeb.IntranetChatLive.FormComponent do
          socket
          |> put_flash(:info, "Message sent")
          |> push_patch(to: socket.assigns.patch)}
-
+         
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end

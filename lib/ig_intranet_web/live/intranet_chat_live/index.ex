@@ -9,7 +9,7 @@ defmodule IgIntranetWeb.IntranetChatLive.Index do
     new_socket =
       socket
       |> assign(:intranet_messages, Chats.list_intranet_message_with_preload())
-      |> assign(:intranet_conversations, Chats.list_intranet_conversations())
+      |> assign(:intranet_conversations, Chats.list_intranet_conversation_with_preload())
       |> assign(:filter_form, %{})
       |> assign(:current_conversation_id, 0)
 

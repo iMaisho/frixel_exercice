@@ -56,5 +56,8 @@ defmodule IgIntranet.Chats.IntranetConversation do
     |> cast(attrs, [:conversation_type, :conversation_status, :conversation_topic])
     |> validate_required([:conversation_type, :conversation_status, :conversation_topic])
     |> unique_constraint(:conversation_topic)
+    |> cast_assoc(:intranet_messages,
+      with: &IgIntranet.Chats.IntranetMessage.changeset_with_conversation/2
+    )
   end
 end
