@@ -1,4 +1,9 @@
 <.header>
+  <:actions>
+    <.link patch={~p"/intranet_chat/new"}>
+      <.button>New conversation</.button>
+    </.link>
+  </:actions>
   <.simple_form id="intranet_chat-form" phx-change="filter" for={@filter_form}>
     <.input
       type="select"
@@ -25,27 +30,67 @@
     recipient_id={1}
     patch={~p"/intranet_chat"}
   />
+
   <.table id="intranet_messages" rows={@intranet_messages}>
     <:col :let={intranet_message} label="Messages">
       <%= if(@current_user && @current_user.id == intranet_message.sender_id) do %>
-        <div style="display:flex; flex-direction:row; justify-content:space-between; position:relative; border-radius:10px; padding:10px 20px; background-color:lightblue;">
-          <div style="font-size:14px; padding:10px; padding-bottom:20px">
-            {intranet_message.message_body}
-          </div>
-          <div style="position:absolute; bottom:10px; right:10px; font-size:10px">
-            {Calendar.strftime(intranet_message.inserted_at, "%d/%m - %H:%M")}
+        <div class="flex gap-2.5 justify-end">
+          <div class="">
+            <div class="grid mb-2">
+              <h5 class="text-right text-gray-900 text-sm font-semibold leading-snug pb-1">
+                You
+              </h5>
+              <div class="px-3 py-2 bg-indigo-600 rounded">
+                <h2 class="text-white text-sm font-normal leading-snug">
+                  {intranet_message.message_body}
+                </h2>
+              </div>
+              <div class="justify-start items-center inline-flex">
+                <h3 class="text-gray-500 text-xs font-normal leading-4 py-1">
+                  {Calendar.strftime(intranet_message.inserted_at, "%d/%m - %H:%M")}
+                </h3>
+              </div>
+            </div>
           </div>
         </div>
       <% else %>
-        <div style="display:flex; flex-direction:row; justify-content:space-between; position:relative; border-radius:10px; padding:10px 20px; background-color:red;">
-          <div style="font-size:14px; padding:10px; padding-bottom:20px">
-            {intranet_message.message_body}
-          </div>
-          <div style="position:absolute; bottom:10px; right:10px; font-size:10px">
-            {Calendar.strftime(intranet_message.inserted_at, "%d/%m - %H:%M")}
+        <div class="grid ">
+          <div class="flex gap-2.5 mb-4">
+            <div class="grid">
+              <div class="w-max grid">
+                <div class="px-3.5 py-2 bg-gray-100 rounded justify-start  items-center gap-3 inline-flex">
+                  <h5 class="text-gray-900 text-sm font-normal leading-snug">
+                    {intranet_message.message_body}
+                  </h5>
+                </div>
+                <div class="justify-end items-center inline-flex mb-2.5">
+                  <h6 class="text-gray-500 text-xs font-normal leading-4 py-1">
+                    {Calendar.strftime(intranet_message.inserted_at, "%d/%m - %H:%M")}
+                  </h6>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       <% end %>
     </:col>
   </.table>
 <% end %>
+
+<.modal
+  :if={@live_action == :new}
+  id="intranet_chat-modal"
+  show
+  on_cancel={JS.patch(~p"/intranet_chat")}
+>
+  <.live_component
+    module={IgIntranetWeb.IntranetChatLive.NewConversationComponent}
+    id={:new}
+    action={@live_action}
+    intranet_conversation={%IgIntranet.Chats.IntranetConversation{}}
+    intranet_message={%IgIntranet.Chats.IntranetMessage{}}
+    sender_id={@current_user.id}
+    recipient_id={1}
+    patch={~p"/intranet_chat"}
+  />
+</.modal>
