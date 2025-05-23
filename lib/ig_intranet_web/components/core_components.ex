@@ -688,4 +688,60 @@ defmodule IgIntranetWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  @doc "Affiche un message envoyé par l'utilisateur"
+  attr :intranet_message, :map, required: true
+
+  def message_sent(assigns) do
+    ~H"""
+    <div class="flex gap-2.5 justify-end">
+      <div class="">
+        <div class="grid mb-2">
+          <h5 class="text-right text-gray-900 text-sm font-semibold leading-snug pb-1">
+            You
+          </h5>
+          <div class="px-3 py-2 bg-indigo-600 rounded">
+            <h2 class="text-white text-sm font-normal leading-snug">
+              {@intranet_message.message_body}
+            </h2>
+          </div>
+          <div class="justify-start items-center inline-flex">
+            <h3 class="text-gray-500 text-xs font-normal leading-4 py-1">
+              {Calendar.strftime(@intranet_message.inserted_at, "%d/%m - %H:%M")}
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  @doc "Affiche un message reçu"
+  attr :intranet_message, :map, required: true
+
+  def message_received(%{intranet_message: m} = assigns) do
+    ~H"""
+    <div class="grid ">
+      <div class="flex gap-2.5 mb-4">
+        <div class="grid">
+          <div class="w-max grid">
+            <h5 class="text-left text-gray-900 text-sm font-semibold leading-snug pb-1">
+              {@intranet_message.sender_id}
+            </h5>
+            <div class="px-3.5 py-2 bg-gray-100 rounded justify-start  items-center gap-3 inline-flex">
+              <h5 class="text-gray-900 text-sm font-normal leading-snug">
+                {@intranet_message.message_body}
+              </h5>
+            </div>
+            <div class="justify-end items-center inline-flex mb-2.5">
+              <h6 class="text-gray-500 text-xs font-normal leading-4 py-1">
+                {Calendar.strftime(@intranet_message.inserted_at, "%d/%m - %H:%M")}
+              </h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
 end
