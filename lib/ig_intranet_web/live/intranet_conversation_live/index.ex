@@ -28,7 +28,7 @@ defmodule IgIntranetWeb.IntranetConversationLive.Index do
 
   defp apply_action(socket, :index, params) do
     {:ok, {intranet_conversations, meta}} =
-      Chats.list_conversations_with_flop(params)
+      Chats.list_pets(params)
 
     socket
     |> assign(:page_title, "Listing Intranet conversations")

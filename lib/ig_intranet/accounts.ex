@@ -11,6 +11,21 @@ defmodule IgIntranet.Accounts do
   ## Database getters
 
   @doc """
+  List all users as tuple {email, id}, excepted current_user given as argument.
+
+  iex> list_users_tuple_except_user_id(1)
+  [{"blabla@gmail.com", 2}, {"test@yahoo.fr", 3}, ...]
+
+  Used by IntranetChatLive.FormComponent to build the users list to discuss with.
+  """
+  def list_users_tuple_except_user_id(user_id) do
+    User
+    |> select([user], {user.email, user.id})
+    |> where([user], user.id != ^user_id)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a user by email.
 
   ## Examples

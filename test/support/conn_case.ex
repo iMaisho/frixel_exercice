@@ -17,6 +17,8 @@ defmodule IgIntranetWeb.ConnCase do
 
   use ExUnit.CaseTemplate
 
+  import IgIntranet.ChatsFixtures
+
   using do
     quote do
       # The default endpoint for testing
@@ -47,6 +49,21 @@ defmodule IgIntranetWeb.ConnCase do
   def register_and_log_in_user(%{conn: conn}) do
     user = IgIntranet.AccountsFixtures.user_fixture()
     %{conn: log_in_user(conn, user), user: user}
+  end
+
+  @doc """
+  Setup helper that authenticate user and create a message by th user.
+
+      setup :authenticate_user_and_create_intranet_message
+
+  It stores an updated connection and a registered user and a message in the
+  test context.
+  """
+  def authenticate_user_and_create_intranet_message(%{conn: conn}) do
+    user = IgIntranet.AccountsFixtures.user_fixture()
+    intranet_message = intranet_message_fixture_with_conversation_preloaded(%{user_id: user.id})
+
+    %{conn: log_in_user(conn, user), user: user, intranet_message: intranet_message}
   end
 
   @doc """

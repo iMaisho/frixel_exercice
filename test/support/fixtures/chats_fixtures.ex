@@ -12,7 +12,8 @@ defmodule IgIntranet.ChatsFixtures do
       attrs
       |> Enum.into(%{
         conversation_type: "public",
-        conversation_status: "active"
+        conversation_status: "active",
+        conversation_topic: "some conversation_topic"
       })
       |> IgIntranet.Chats.create_intranet_conversation()
 
@@ -27,13 +28,40 @@ defmodule IgIntranet.ChatsFixtures do
       attrs[:intranet_conversation_id] ||
         intranet_conversation_fixture(attrs[:intranet_conversation] || %{}).id
 
+    user_id =
+      attrs[:user_id] || IgIntranet.AccountsFixtures.user_fixture(attrs[:user] || %{}).id
+
     {:ok, intranet_message} =
       attrs
       |> Enum.into(%{
         intranet_conversation_id: intranet_conversation_id,
-        message_body: "some message_body"
+        message_body: "some message_body",
+        user_id: user_id
       })
       |> IgIntranet.Chats.create_intranet_message()
+
+    intranet_message
+  end
+
+  @doc """
+  Generate a intranet_message with preload on conversation.
+  """
+  def intranet_message_fixture_with_conversation_preloaded(attrs \\ %{}) do
+    intranet_conversation_id =
+      attrs[:intranet_conversation_id] ||
+        intranet_conversation_fixture(attrs[:intranet_conversation] || %{}).id
+
+    user_id =
+      attrs[:user_id] || IgIntranet.AccountsFixtures.user_fixture(attrs[:user] || %{}).id
+
+    {:ok, intranet_message} =
+      attrs
+      |> Enum.into(%{
+        intranet_conversation_id: intranet_conversation_id,
+        user_id: user_id,
+        message_body: "some message_body"
+      })
+      |> IgIntranet.Chats.create_intranet_message_with_preload()
 
     intranet_message
   end

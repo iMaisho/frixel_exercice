@@ -37,7 +37,7 @@ defmodule IgIntranet.Chats.IntranetConversation do
         ]
       ]
     ],
-    default_limit: 10
+    default_limit: 4
   }
 
   schema "intranet_conversations" do
@@ -54,10 +54,8 @@ defmodule IgIntranet.Chats.IntranetConversation do
   def changeset(intranet_conversation, attrs) do
     intranet_conversation
     |> cast(attrs, [:conversation_type, :conversation_status, :conversation_topic])
+    |> cast_assoc(:intranet_messages, with: &IgIntranet.Chats.IntranetMessage.nested_changeset/2)
     |> validate_required([:conversation_type, :conversation_status, :conversation_topic])
     |> unique_constraint(:conversation_topic)
-    |> cast_assoc(:intranet_messages,
-      with: &IgIntranet.Chats.IntranetMessage.changeset_with_conversation/2
-    )
   end
 end

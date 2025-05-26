@@ -4,26 +4,31 @@ defmodule IgIntranetWeb.IntranetMessageLiveTest do
   import Phoenix.LiveViewTest
   import IgIntranet.ChatsFixtures
 
-  @create_attrs %{message_body: "some message_body"}
-  @update_attrs %{message_body: "some updated message_body"}
-  @invalid_attrs %{message_body: nil}
+  @invalid_attrs %{message_body: nil, intranet_conversation_id: nil, user_id: nil}
 
   defp create_intranet_message(_) do
-    intranet_message = intranet_message_fixture()
+    intranet_message = intranet_message_fixture_with_conversation_preloaded()
     %{intranet_message: intranet_message}
   end
 
   describe "Index" do
-    setup [:create_intranet_message]
+    setup [:authenticate_user_and_create_intranet_message]
 
-    test "lists all intranet_messages", %{conn: conn, intranet_message: intranet_message} do
+    test "lists all intranet_messages", %{conn: conn} do
       {:ok, _index_live, html} = live(conn, ~p"/intranet_messages")
 
       assert html =~ "Listing Intranet messages"
-      assert html =~ intranet_message.message_body
+      assert html =~ "some message_body"
     end
 
-    test "saves new intranet_message", %{conn: conn} do
+    test "saves new intranet_message", %{conn: conn, user: user_registered} do
+      create_attrs = %{
+        message_body: "some another message_body",
+        intranet_conversation_id:
+          intranet_conversation_fixture(%{conversation_topic: "another conversation_topic"}).id,
+        user_id: user_registered.id
+      }
+
       {:ok, index_live, _html} = live(conn, ~p"/intranet_messages")
 
       assert index_live |> element("a", "New Intranet message") |> render_click() =~
@@ -36,17 +41,27 @@ defmodule IgIntranetWeb.IntranetMessageLiveTest do
              |> render_change() =~ "can&#39;t be blank"
 
       assert index_live
-             |> form("#intranet_message-form", intranet_message: @create_attrs)
+             |> form("#intranet_message-form", intranet_message: create_attrs)
              |> render_submit()
 
       assert_patch(index_live, ~p"/intranet_messages")
 
       html = render(index_live)
       assert html =~ "Intranet message created successfully"
-      assert html =~ "some message_body"
+      assert html =~ "some another message_body"
     end
 
-    test "updates intranet_message in listing", %{conn: conn, intranet_message: intranet_message} do
+    test "updates intranet_message in listing", %{
+      conn: conn,
+      intranet_message: intranet_message
+    } do
+      update_attrs =
+        %{
+          message_body: "some updated message_body",
+          intranet_conversation_id: intranet_message.intranet_conversation.id,
+          user_id: intranet_message.user_id
+        }
+
       {:ok, index_live, _html} = live(conn, ~p"/intranet_messages")
 
       assert index_live
@@ -61,7 +76,7 @@ defmodule IgIntranetWeb.IntranetMessageLiveTest do
              |> render_change() =~ "can&#39;t be blank"
 
       assert index_live
-             |> form("#intranet_message-form", intranet_message: @update_attrs)
+             |> form("#intranet_message-form", intranet_message: update_attrs)
              |> render_submit()
 
       assert_patch(index_live, ~p"/intranet_messages")
@@ -83,7 +98,7 @@ defmodule IgIntranetWeb.IntranetMessageLiveTest do
   end
 
   describe "Show" do
-    setup [:create_intranet_message]
+    setup [:create_intranet_message, :register_and_log_in_user]
 
     test "displays intranet_message", %{conn: conn, intranet_message: intranet_message} do
       {:ok, _show_live, html} = live(conn, ~p"/intranet_messages/#{intranet_message}")
@@ -94,8 +109,15 @@ defmodule IgIntranetWeb.IntranetMessageLiveTest do
 
     test "updates intranet_message within modal", %{
       conn: conn,
-      intranet_message: intranet_message
+      intranet_message: intranet_message,
+      user: user_registered
     } do
+      update_attrs = %{
+        message_body: "some updated message_body",
+        intranet_conversation_id: intranet_message.intranet_conversation.id,
+        user_id: user_registered.id
+      }
+
       {:ok, show_live, _html} = live(conn, ~p"/intranet_messages/#{intranet_message}")
 
       assert show_live |> element("a", "Edit") |> render_click() =~
@@ -108,7 +130,7 @@ defmodule IgIntranetWeb.IntranetMessageLiveTest do
              |> render_change() =~ "can&#39;t be blank"
 
       assert show_live
-             |> form("#intranet_message-form", intranet_message: @update_attrs)
+             |> form("#intranet_message-form", intranet_message: update_attrs)
              |> render_submit()
 
       assert_patch(show_live, ~p"/intranet_messages/#{intranet_message}")

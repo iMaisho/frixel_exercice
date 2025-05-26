@@ -1,4 +1,8 @@
 defmodule IgIntranet.Accounts.UserNotifier do
+  @moduledoc """
+    Ce module contient tous les moyens utilisés pour notifier des informations à un utilisateur de l'intranet.
+
+  """
   import Swoosh.Email
 
   alias IgIntranet.Mailer

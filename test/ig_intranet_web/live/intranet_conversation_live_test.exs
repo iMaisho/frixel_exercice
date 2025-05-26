@@ -6,13 +6,15 @@ defmodule IgIntranetWeb.IntranetConversationLiveTest do
 
   @create_attrs %{
     conversation_type: "public",
-    conversation_status: "active"
+    conversation_status: "active",
+    conversation_topic: "some other conversation_topic"
   }
   @update_attrs %{
     conversation_type: "private",
-    conversation_status: "archived"
+    conversation_status: "archived",
+    conversation_topic: "some updated conversation_topic"
   }
-  @invalid_attrs %{conversation_type: "private", conversation_status: "archived"}
+  @invalid_attrs %{conversation_type: nil, conversation_status: nil, conversation_topic: nil}
 
   defp create_intranet_conversation(_) do
     intranet_conversation = intranet_conversation_fixture()

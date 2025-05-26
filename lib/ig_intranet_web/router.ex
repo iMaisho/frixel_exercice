@@ -26,6 +26,13 @@ defmodule IgIntranetWeb.Router do
 
     get "/", PageController, :home
     get "/same_home_but_different", PageController, :home
+
+    # Routes de la live intranet_conversations
+    live "/intranet_conversations", IntranetConversationLive.Index, :index
+    live "/intranet_conversations/new", IntranetConversationLive.Index, :new
+    live "/intranet_conversations/:id/edit", IntranetConversationLive.Index, :edit
+    live "/intranet_conversations/:id", IntranetConversationLive.Show, :show
+    live "/intranet_conversations/:id/show/edit", IntranetConversationLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
@@ -70,7 +77,10 @@ defmodule IgIntranetWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
-      on_mount: [{IgIntranetWeb.UserAuth, :ensure_authenticated}] do
+      on_mount: [
+        {IgIntranetWeb.UserAuth, :ensure_authenticated},
+        {IgIntranetWeb.UserAuth, :mount_current_user}
+      ] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
@@ -85,14 +95,17 @@ defmodule IgIntranetWeb.Router do
       on_mount: [{IgIntranetWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+    end
+  end
 
-      # Routes de la live intranet_conversations
-      live "/intranet_conversations", IntranetConversationLive.Index, :index
-      live "/intranet_conversations/new", IntranetConversationLive.Index, :new
-      live "/intranet_conversations/:id/edit", IntranetConversationLive.Index, :edit
-      live "/intranet_conversations/:id", IntranetConversationLive.Show, :show
-      live "/intranet_conversations/:id/show/edit", IntranetConversationLive.Show, :edit
+  scope "/", IgIntranetWeb do
+    pipe_through [:browser, :require_authenticated_user]
 
+    live_session :require_authenticated_and_mounted_user,
+      on_mount: [
+        {IgIntranetWeb.UserAuth, :ensure_authenticated},
+        {IgIntranetWeb.UserAuth, :mount_current_user}
+      ] do
       # Routes de la live intranet_messages
       live "/intranet_messages", IntranetMessageLive.Index, :index
       live "/intranet_messages/new", IntranetMessageLive.Index, :new
@@ -100,9 +113,10 @@ defmodule IgIntranetWeb.Router do
       live "/intranet_messages/:id", IntranetMessageLive.Show, :show
       live "/intranet_messages/:id/show/edit", IntranetMessageLive.Show, :edit
 
-      # Routes de la live intranet_chat
-      live "/intranet_chat", IntranetChatLive.Index, :index
-      live "/intranet_chat/new", IntranetChatLive.Index, :new
+      # Route d'une première mini messagerie
+      live "/intranet_chat", IntranetChatLive, :index
+      live "/intranet_chat/new", IntranetChatLive, :new
+      live "/intranet_chat/new_conv", IntranetChatLive, :new_conv
     end
   end
 end

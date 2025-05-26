@@ -6,32 +6,14 @@ defmodule IgIntranet.Chats.IntranetMessage do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Hex.API.User
   alias IgIntranet.Chats.IntranetConversation
   alias IgIntranet.Accounts.User
 
-  @derive {
-    Flop.Schema,
-    filterable: [:intranet_conversation_id],
-    sortable: [
-      :inserted_at,
-      :message_body
-    ],
-    adapter_opts: [
-      join_fields: [
-        conversation_id: [
-          binding: :intranet_conversations,
-          field: :id,
-          ecto_type: :string
-        ]
-      ]
-    ]
-  }
   schema "intranet_messages" do
     field :message_body, :string
 
     belongs_to(:intranet_conversation, IntranetConversation)
-    belongs_to(:sender, User, foreign_key: :sender_id)
+    belongs_to(:user, User)
     belongs_to(:recipient, User, foreign_key: :recipient_id)
 
     timestamps(type: :utc_datetime)
@@ -40,14 +22,19 @@ defmodule IgIntranet.Chats.IntranetMessage do
   @doc false
   def changeset(intranet_message, attrs) do
     intranet_message
-    |> cast(attrs, [:message_body, :intranet_conversation_id, :sender_id, :recipient_id])
-    |> validate_required([:message_body, :intranet_conversation_id, :sender_id, :recipient_id])
+    |> cast(attrs, [:message_body, :intranet_conversation_id, :user_id, :recipient_id])
+    |> validate_required([:message_body, :intranet_conversation_id])
   end
 
-    @doc false
-    def changeset_with_conversation(intranet_message, attrs) do
-      intranet_message
-      |> cast(attrs, [:message_body, :sender_id, :recipient_id])
-      |> validate_required([:message_body, :sender_id, :recipient_id])
-    end
+  @doc """
+  Changeset ne rendant pas obligatoire :intranet_conversation_id en paramètre.
+  Utilisé par &IntranetConversation.changeset/2 au travers du &cast_assoc/3,
+  lui-même utilisé par IntranetChatLive dans le formulaire avec l'inputs_for : lorssque l'on crée une conversation et son premier message en même temps.
+
+  """
+  def nested_changeset(intranet_message, attrs) do
+    intranet_message
+    |> cast(attrs, [:message_body, :intranet_conversation_id, :user_id, :recipient_id])
+    |> validate_required([:message_body])
+  end
 end

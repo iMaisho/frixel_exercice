@@ -6,7 +6,11 @@ defmodule IgIntranetWeb.IntranetMessageLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :intranet_messages, Chats.list_intranet_message_with_preload())}
+    intranet_messages = fetch_intranet_messages(socket.assigns.current_user)
+
+    {:ok,
+     socket
+     |> stream(:intranet_messages, intranet_messages)}
   end
 
   @impl true
@@ -52,5 +56,13 @@ defmodule IgIntranetWeb.IntranetMessageLive.Index do
     {:ok, _} = Chats.delete_intranet_message(intranet_message)
 
     {:noreply, stream_delete(socket, :intranet_messages, intranet_message)}
+  end
+
+  defp fetch_intranet_messages(current_user) do
+    current_user
+    |> case do
+      nil -> Chats.list_intranet_message_with_preload()
+      _current_user -> Chats.list_intranet_message_by_user_id_with_preload(current_user.id)
+    end
   end
 end

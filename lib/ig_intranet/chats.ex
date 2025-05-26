@@ -7,7 +7,6 @@ defmodule IgIntranet.Chats do
   alias IgIntranet.Repo
 
   alias IgIntranet.Chats.IntranetConversation
-  alias IgIntranet.Chats
 
   @doc """
   Returns the list of intranet_conversations.
@@ -30,9 +29,28 @@ defmodule IgIntranet.Chats do
   """
   def list_intranet_conversation_with_preload do
     IntranetConversation
-    |> order_by([conv], asc: conv.inserted_at)
+    |> order_by([conv], desc: conv.inserted_at)
     |> Repo.all()
     |> Repo.preload(:intranet_messages)
+  end
+
+  @doc """
+  List conversations as tuple {conversation_topic, id} created by a user, given as argument (user_id).
+
+  iex> list_intranet_conversation_tuple_by_user_id(1)
+  [{"some conversation_topic", 1}, {"some other conversation_topic", 2}, ...]
+
+  Used by IntranetChatLive.FormComponent to give the list of conversations to attach message to.
+  """
+  def list_intranet_conversation_tuple_by_user_id(user_id) do
+    IntranetConversation
+    |> select([conv], {conv.conversation_topic, conv.id})
+    |> distinct([conv], conv.id)
+    |> order_by([conv], desc: conv.inserted_at)
+    |> join(:left, [conv], message in assoc(conv, :intranet_messages))
+    |> where([_conv, message], message.user_id == ^user_id)
+    |> or_where([_conv, message], message.recipient_id == ^user_id)
+    |> Repo.all()
   end
 
   def list_intranet_conversation_filter_with_preload(filter) do
@@ -45,7 +63,7 @@ defmodule IgIntranet.Chats do
     |> Repo.preload(:intranet_messages)
   end
 
-  def list_conversations_with_flop(params) do
+  def list_pets(params) do
     IntranetConversation
     |> join(:left, [ic], im in assoc(ic, :intranet_messages), as: :intranet_messages)
     |> preload([intranet_messages: im], intranet_messages: im)
@@ -74,6 +92,17 @@ defmodule IgIntranet.Chats do
   def get_intranet_conversation_with_preload!(id),
     do:
       Repo.get!(IntranetConversation, id)
+      |> Repo.preload(:intranet_messages)
+
+  @doc """
+  Preload une conversation avec ses [%IntranetMessage{}, ...].
+
+  Utilisé lors de la création d'une première conversation, et losqqu'on a besoin d'avoir le(s) message(s) preloaded.
+  Typiquement dans IntranetChatLive lors de la création d'une %IntranetConversation{}.
+  """
+  def preload_intranet_conversation_with_message(conversation),
+    do:
+      conversation
       |> Repo.preload(:intranet_messages)
 
   @doc """
@@ -161,36 +190,45 @@ defmodule IgIntranet.Chats do
   end
 
   @doc """
+  List all messages preloaded with user (ie: message writer) and recipient.
+
+  iex> list_intranet_messages_with_preload_by_user_id(1)
+  [%IntranetMessage{id: ..., user_id: 1}, %IntranetMessage{recipient_id: 1, ...}, %IntranetMessage{}, ...]
+
+  Used by IntranetChatLive to retrieve all messages linked to a given user (writer or recipiendary).
+  """
+  def list_intranet_messages_with_preload_by_user_id(user_id) do
+    IntranetMessage
+    |> order_by([mess], desc: mess.inserted_at)
+    |> where([im], im.user_id == ^user_id)
+    |> or_where([im], im.recipient_id == ^user_id)
+    |> Repo.all()
+    |> Repo.preload([:user, :recipient])
+  end
+
+  @doc """
   Returns the list of intranet_messages with the intranet_conversation associated.
   ## Examples
       iex> list_intranet_message_with_preload()
       [%list_intranet_message{...intranet_message{}}, ...]
   """
   def list_intranet_message_with_preload do
+    Repo.all(IntranetMessage)
+    |> Repo.preload(:intranet_conversation)
+  end
+
+  @doc """
+  Returns the list of intranet_messages (filtered by a single user_id) with the intranet_conversation associated.
+  ## Examples
+      iex> list_intranet_message_with_preload(2)
+      [%list_intranet_message{...intranet_message{}}, ...]
+  """
+  def list_intranet_message_by_user_id_with_preload(user_id) do
     IntranetMessage
-    |> order_by([message], desc: message.inserted_at)
+    |> where([im], im.user_id == ^user_id)
     |> Repo.all()
     |> Repo.preload(:intranet_conversation)
-    |> Repo.preload(:sender)
-    |> Repo.preload(:recipient)
-  end
-
-  def list_intranet_message_by_conversation_id(id) do
-    IntranetMessage
-    |> where([m], m.intranet_conversation_id == ^id)
-    |> order_by([m], desc: m.inserted_at)
-    |> Repo.all()
-  end
-
-  def list_messages_with_flop(params) do
-    IntranetMessage
-    |> join(:left, [im], ic in assoc(im, :intranet_conversation), as: :intranet_conversations)
-    |> preload([intranet_conversations: ic], intranet_conversation: ic)
-    |> order_by([message], desc: message.inserted_at)
-    |> Flop.validate_and_run(params,
-      for: IntranetMessage,
-      replace_invalid_params: true
-    )
+    |> Repo.preload(:user)
   end
 
   @doc """
@@ -213,6 +251,11 @@ defmodule IgIntranet.Chats do
     do:
       Repo.get!(IntranetMessage, id)
       |> Repo.preload(:intranet_conversation)
+      |> Repo.preload(:user)
+
+  def preload_intranet_message_with_user(intranet_message) do
+    Repo.preload(intranet_message, :user)
+  end
 
   @doc """
   Creates a intranet_message.
@@ -230,7 +273,35 @@ defmodule IgIntranet.Chats do
     %IntranetMessage{}
     |> IntranetMessage.changeset(attrs)
     |> Repo.insert()
-    |> Chats.broadcast(:message_created)
+    |> message_broadcast(:message_created)
+  end
+
+  @doc """
+  Creates a intranet_message with preload on conversation.
+
+  ## Examples
+
+      iex> create_intranet_message_with_preload(%{field: value})
+      {:ok, %IntranetMessage{}}
+
+      iex> create_intranet_message_with_preload(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_intranet_message_with_preload(attrs \\ %{}) do
+    %IntranetMessage{}
+    |> IntranetMessage.changeset(attrs)
+    |> Repo.insert()
+    |> case do
+      {:ok, intranet_message_created} ->
+        {:ok,
+         intranet_message_created
+         |> Repo.preload(:intranet_conversation)
+         |> Repo.preload(:user)}
+
+      other ->
+        other
+    end
   end
 
   @doc """
@@ -249,7 +320,6 @@ defmodule IgIntranet.Chats do
     intranet_message
     |> IntranetMessage.changeset(attrs)
     |> Repo.update()
-    |> Chats.broadcast(:message_updated)
   end
 
   @doc """
@@ -285,13 +355,13 @@ defmodule IgIntranet.Chats do
     Repo.preload(intranet_message, :intranet_conversation)
   end
 
-  def subscribe() do
+  def message_subscribe() do
     Phoenix.PubSub.subscribe(IgIntranet.PubSub, "messages")
   end
 
-  def broadcast({:error, _reason} = error, _event), do: error
+  defp message_broadcast({:error, _reason} = error, _event), do: error
 
-  def broadcast({:ok, message}, event) do
+  defp message_broadcast({:ok, message}, event) do
     Phoenix.PubSub.broadcast(IgIntranet.PubSub, "messages", {event, message})
     {:ok, message}
   end

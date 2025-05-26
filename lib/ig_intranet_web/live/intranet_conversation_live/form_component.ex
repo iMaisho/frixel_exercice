@@ -25,12 +25,14 @@ defmodule IgIntranetWeb.IntranetConversationLive.FormComponent do
           type="select"
           options={Ecto.Enum.values(IgIntranet.Chats.IntranetConversation, :conversation_type)}
           label="Conversation type"
+          prompt="Select a conversation type"
         />
         <.input
           field={@form[:conversation_status]}
           type="select"
           options={Ecto.Enum.values(IgIntranet.Chats.IntranetConversation, :conversation_status)}
           label="Conversation status"
+          prompt="Select a conversation status"
         />
         <:actions>
           <.button phx-disable-with="Saving...">Save Intranet conversation</.button>

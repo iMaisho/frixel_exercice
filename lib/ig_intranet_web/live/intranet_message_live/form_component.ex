@@ -24,13 +24,19 @@ defmodule IgIntranetWeb.IntranetMessageLive.FormComponent do
           type="select"
           label="Conversation rattachée"
           options={@intranet_conversations}
+          prompt="Select a conversation"
         />
         <.input field={@form[:message_body]} type="text" label="Message body" />
+        <.input
+          field={@form[:user_id]}
+          type="text"
+          label="Utilisateur rattaché"
+          value={(@current_user && @current_user.id) || ""}
+        />
+        <p>Email utilisateur associé : {(@current_user && @current_user.email) || "N/A"}</p>
         <:actions>
           <.button phx-disable-with="Saving...">Save Intranet message</.button>
         </:actions>
-        <.input field={@form[:sender_id]} type="hidden" value={@sender_id} />
-        <.input field={@form[:recipient_id]} type="hidden" value={@recipient_id} />
       </.simple_form>
     </div>
     """
@@ -48,6 +54,9 @@ defmodule IgIntranetWeb.IntranetMessageLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"intranet_message" => intranet_message_params}, socket) do
+    intranet_message_params =
+      maybe_add_user_id_to_params(intranet_message_params, socket.assigns.current_user)
+
     changeset =
       Chats.change_intranet_message(socket.assigns.intranet_message, intranet_message_params)
 
@@ -55,6 +64,9 @@ defmodule IgIntranetWeb.IntranetMessageLive.FormComponent do
   end
 
   def handle_event("save", %{"intranet_message" => intranet_message_params}, socket) do
+    intranet_message_params =
+      maybe_add_user_id_to_params(intranet_message_params, socket.assigns.current_user)
+
     save_intranet_message(socket, socket.assigns.action, intranet_message_params)
   end
 
@@ -89,4 +101,16 @@ defmodule IgIntranetWeb.IntranetMessageLive.FormComponent do
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
+
+  defp maybe_add_user_id_to_params(params, current_user) do
+    current_user
+    |> case do
+      nil ->
+        params
+
+      _params ->
+        params
+        |> Map.merge(%{"user_id" => current_user.id})
+    end
+  end
 end

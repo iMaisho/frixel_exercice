@@ -1,7 +1,13 @@
 defmodule IgIntranet.Accounts.User do
+  @moduledoc """
+    user représente un utilisateur de l'intranet.
+
+  """
+
+  alias IgIntranet.Chats.IntranetMessage
+
   use Ecto.Schema
   import Ecto.Changeset
-  alias IgIntranet.Chats.IntranetMessage
 
   schema "users" do
     field :email, :string
@@ -9,8 +15,8 @@ defmodule IgIntranet.Accounts.User do
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
-    has_many(:sent_messages, IntranetMessage, on_delete: :nothing, foreign_key: :sender_id)
-    has_many(:received_messages, IntranetMessage, on_delete: :nothing, foreign_key: :recipient_id)
+
+    has_many(:intranet_messages, IntranetMessage, on_delete: :delete_all)
 
     timestamps(type: :utc_datetime)
   end

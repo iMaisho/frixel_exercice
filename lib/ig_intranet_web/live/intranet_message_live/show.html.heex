@@ -31,6 +31,7 @@
     action={@live_action}
     intranet_message={@intranet_message}
     intranet_conversations={@intranet_conversations |> Enum.map(&{&1.id, &1.id})}
+    current_user={@current_user}
     patch={~p"/intranet_messages/#{@intranet_message}"}
   />
 </.modal>

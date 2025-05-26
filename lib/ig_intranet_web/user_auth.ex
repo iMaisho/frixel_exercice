@@ -1,4 +1,9 @@
 defmodule IgIntranetWeb.UserAuth do
+  @moduledoc """
+    Module qui permet de gérer l'authentification (connexion, déconnexion, etc).
+
+  """
+
   use IgIntranetWeb, :verified_routes
 
   import Plug.Conn

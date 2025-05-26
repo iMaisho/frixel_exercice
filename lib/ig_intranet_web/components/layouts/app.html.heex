@@ -9,24 +9,18 @@
       </p>
     </div>
     <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
-      <div class="w-full">
-        <nav class="border-b text-sm flex justify-start">
-          <.switch_locale_path
-            locale={:en}
-            language="English"
-            active={Gettext.get_locale(IgIntranetWeb.Gettext) == "en"}
-          />
-          <.switch_locale_path
-            locale={:fr}
-            language="Français"
-            active={Gettext.get_locale(IgIntranetWeb.Gettext) == "fr"}
-          />
-        </nav>
-      </div>
-      <a href={~p"/same_home_but_different"}>home</a>
-      <a href={~p"/intranet_conversations"}>conversations</a>
-      <a href={~p"/intranet_messages"}>messages</a>
-      <a href={~p"/intranet_chat"}>chat</a>
+      <a href="https://twitter.com/elixirphoenix" class="hover:text-zinc-700">
+        @elixirphoenix
+      </a>
+      <a href="https://github.com/phoenixframework/phoenix" class="hover:text-zinc-700">
+        GitHub
+      </a>
+      <a
+        href="https://hexdocs.pm/phoenix/overview.html"
+        class="rounded-lg bg-zinc-100 px-2 py-1 hover:bg-zinc-200/80"
+      >
+        Get Started <span aria-hidden="true">&rarr;</span>
+      </a>
     </div>
   </div>
 </header>

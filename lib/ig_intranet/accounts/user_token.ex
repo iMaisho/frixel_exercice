@@ -1,4 +1,9 @@
 defmodule IgIntranet.Accounts.UserToken do
+  @moduledoc """
+    Module qui permet de gérer le token utilisé lors de l'authentification (connexion, déconnexion, etc).
+
+  """
+
   use Ecto.Schema
   import Ecto.Query
   alias IgIntranet.Accounts.UserToken
