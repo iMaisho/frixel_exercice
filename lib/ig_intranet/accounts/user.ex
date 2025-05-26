@@ -18,6 +18,10 @@ defmodule IgIntranet.Accounts.User do
 
     has_many(:intranet_messages, IntranetMessage, on_delete: :delete_all)
 
+    many_to_many(:intranet_conversations, IgIntranet.Chats.IntranetConversation,
+      join_through: "conversation_users"
+    )
+
     timestamps(type: :utc_datetime)
   end
 

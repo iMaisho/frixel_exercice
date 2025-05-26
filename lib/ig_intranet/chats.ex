@@ -73,6 +73,12 @@ defmodule IgIntranet.Chats do
     )
   end
 
+  def list_conversations_topics_and_ids() do
+    IntranetConversation
+    |> select([conv], {conv.conversation_topic, conv.id})
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single intranet_conversation.
 
