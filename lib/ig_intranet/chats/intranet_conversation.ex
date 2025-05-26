@@ -46,6 +46,7 @@ defmodule IgIntranet.Chats.IntranetConversation do
     field :conversation_topic, :string
 
     has_many(:intranet_messages, IntranetMessage, on_delete: :delete_all)
+    many_to_many(:users, IgIntranet.Accounts.User, join_through: "conversation_users")
 
     timestamps(type: :utc_datetime)
   end
