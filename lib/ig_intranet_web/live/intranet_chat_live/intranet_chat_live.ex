@@ -79,7 +79,7 @@ defmodule IgIntranetWeb.IntranetChatLive do
     # on ajoute ici le user_id (créateur du message) pour éivter une manipulation malveillante dans le formulaire.
     intranet_conversation_params
     |> Kernel.put_in(["intranet_messages", "0", "user_id"], current_user.id)
-    |> Chats.create_intranet_conversation()
+    |> Chats.create_intranet_conversation_with_users()
     |> case do
       {:ok, conversation} ->
         first_and_only_message =
@@ -194,6 +194,14 @@ defmodule IgIntranetWeb.IntranetChatLive.FormConversationComponent do
           placeholder="Titre de votre conversation"
           required
         />
+        <.input
+          type="select"
+          multiple
+          label="Recipients"
+          required
+          options={@other_users_list}
+          field={@form[:user_list]}
+        />
         <input type="hidden" name="intranet_conversation[conversation_type]" value="private" />
         <input type="hidden" name="intranet_conversation[conversation_status]" value="active" />
         <.inputs_for :let={mess} field={@form[:intranet_messages]}>
@@ -203,13 +211,13 @@ defmodule IgIntranetWeb.IntranetChatLive.FormConversationComponent do
             label="Nouveau message"
             placeholder="Démarrez votre conversation"
           />
-          <.input
+          <%!-- <.input
             field={mess[:recipient_id]}
             type="select"
             label="Destinataire"
             options={@users}
             prompt="Select a user"
-          />
+          /> --%>
         </.inputs_for>
         <:actions>
           <.button phx-disable-with="Saving...">Save  message</.button>
@@ -225,7 +233,7 @@ defmodule IgIntranetWeb.IntranetChatLive.FormConversationComponent do
 
     {:ok,
      socket
-     |> assign(users: users)
+     |> assign(other_users_list: users)
      |> assign_form()}
   end
 

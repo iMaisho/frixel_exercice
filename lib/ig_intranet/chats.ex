@@ -129,6 +129,12 @@ defmodule IgIntranet.Chats do
     |> Repo.insert()
   end
 
+  def create_intranet_conversation_with_users(attrs \\ %{}) do
+    %IntranetConversation{}
+    |> IntranetConversation.changeset_with_users(attrs)
+    |> Repo.insert()
+  end
+
   @doc """
   Updates a intranet_conversation.
 
@@ -174,6 +180,13 @@ defmodule IgIntranet.Chats do
   """
   def change_intranet_conversation(%IntranetConversation{} = intranet_conversation, attrs \\ %{}) do
     IntranetConversation.changeset(intranet_conversation, attrs)
+  end
+
+  def change_intranet_conversation_with_users(
+        %IntranetConversation{} = intranet_conversation,
+        attrs \\ %{}
+      ) do
+    IntranetConversation.changeset_with_users(intranet_conversation, attrs)
   end
 
   def preload_intranet_messages(intranet_conversation) do

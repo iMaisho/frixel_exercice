@@ -44,6 +44,7 @@ defmodule IgIntranet.Chats.IntranetConversation do
     field :conversation_type, Ecto.Enum, values: [:public, :private]
     field :conversation_status, Ecto.Enum, values: [:active, :archived]
     field :conversation_topic, :string
+    field :user_list, {:array, :string}, virtual: true
 
     has_many(:intranet_messages, IntranetMessage, on_delete: :delete_all)
     many_to_many(:users, IgIntranet.Accounts.User, join_through: "conversation_users")
@@ -54,9 +55,18 @@ defmodule IgIntranet.Chats.IntranetConversation do
   @doc false
   def changeset(intranet_conversation, attrs) do
     intranet_conversation
-    |> cast(attrs, [:conversation_type, :conversation_status, :conversation_topic])
+    |> cast(attrs, [:conversation_type, :conversation_status, :conversation_topic, :user_list])
     |> cast_assoc(:intranet_messages, with: &IgIntranet.Chats.IntranetMessage.nested_changeset/2)
     |> validate_required([:conversation_type, :conversation_status, :conversation_topic])
     |> unique_constraint(:conversation_topic)
+  end
+
+  def changeset_with_users(intranet_conversation, attrs) do
+    user_id_list = Enum.map(attrs["user_list"], fn x -> String.to_integer(x) end)
+
+    user_list = IgIntranet.Accounts.list_users_by_id(user_id_list)
+
+    changeset(intranet_conversation, attrs)
+    |> put_assoc(:users, user_list, required: true)
   end
 end

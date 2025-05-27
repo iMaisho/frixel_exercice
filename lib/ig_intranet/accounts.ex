@@ -25,6 +25,12 @@ defmodule IgIntranet.Accounts do
     |> Repo.all()
   end
 
+  def list_users_by_id(id_list) do
+    User
+    |> where([user], user.id in ^id_list)
+    |> Repo.all()
+  end
+
   @doc """
   Gets a user by email.
 
