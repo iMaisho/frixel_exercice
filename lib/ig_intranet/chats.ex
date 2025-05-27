@@ -129,9 +129,9 @@ defmodule IgIntranet.Chats do
     |> Repo.insert()
   end
 
-  def create_intranet_conversation_with_users(attrs \\ %{}) do
+  def create_intranet_conversation_with_users(attrs, current_user) do
     %IntranetConversation{}
-    |> IntranetConversation.changeset_with_users(attrs)
+    |> IntranetConversation.changeset_with_users(current_user, attrs)
     |> Repo.insert()
   end
 

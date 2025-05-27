@@ -76,10 +76,12 @@ defmodule IgIntranetWeb.IntranetChatLive do
         %{"intranet_conversation" => intranet_conversation_params},
         %{assigns: %{current_user: current_user}} = socket
       ) do
+    IO.inspect(current_user)
+
     # on ajoute ici le user_id (créateur du message) pour éivter une manipulation malveillante dans le formulaire.
     intranet_conversation_params
     |> Kernel.put_in(["intranet_messages", "0", "user_id"], current_user.id)
-    |> Chats.create_intranet_conversation_with_users()
+    |> Chats.create_intranet_conversation_with_users(current_user)
     |> case do
       {:ok, conversation} ->
         first_and_only_message =
