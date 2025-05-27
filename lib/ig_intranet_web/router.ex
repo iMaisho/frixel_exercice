@@ -117,6 +117,11 @@ defmodule IgIntranetWeb.Router do
       live "/intranet_chat", IntranetChatLive, :index
       live "/intranet_chat/new", IntranetChatLive, :new
       live "/intranet_chat/new_conv", IntranetChatLive, :new_conv
+
+      # Route d'une première mini messagerie
+      live "/intranet_conv", IntranetConvLive, :index
+      live "/intranet_conv/new", IntranetConvLive, :new
+      live "/intranet_conv/new_conv", IntranetConvLive, :new_conv
     end
   end
 end

@@ -34,6 +34,15 @@ defmodule IgIntranet.Chats do
     |> Repo.preload(:intranet_messages)
   end
 
+  def list_intranet_conversations_with_preload_by_user_id(user_id) do
+    IntranetConversation
+    |> join(:left, [c], u in assoc(c, :users))
+    |> where([_c, u], u.id == ^user_id)
+    |> order_by([c, _u], desc: c.inserted_at)
+    |> preload([:users, :intranet_messages])
+    |> Repo.all()
+  end
+
   @doc """
   List conversations as tuple {conversation_topic, id} created by a user, given as argument (user_id).
 
@@ -248,6 +257,13 @@ defmodule IgIntranet.Chats do
     |> Repo.all()
     |> Repo.preload(:intranet_conversation)
     |> Repo.preload(:user)
+  end
+
+  def list_intranet_message_by_conversation_id(id) do
+    IntranetMessage
+    |> where([m], m.intranet_conversation_id == ^id)
+    |> order_by([m], desc: m.inserted_at)
+    |> Repo.all()
   end
 
   @doc """
