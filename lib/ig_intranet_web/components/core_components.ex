@@ -25,17 +25,19 @@ defmodule IgIntranetWeb.CoreComponents do
 
   def left_chat(assigns) do
     ~H"""
-    <h5 class="text-gray-900 text-sm font-semibold pb-1">{@speaker}</h5>
-    <div class="w-max grid">
-      <div class="px-3.5 py-2 bg-gray-100 rounded-e-lg rounded-es-lg justify-start items-center gap-3 inline-flex">
-        <h5 class="text-gray-900 text-sm font-normal">
-          {render_slot(@inner_block)}
-        </h5>
-      </div>
-      <div class="justify-end items-center inline-flex mb-2.5">
-        <h6 class="text-gray-500 text-xs font-normal leading-4 py-1">
-          {@message_time |> Calendar.strftime("%d-%m-%Y %H:%M:%S")}
-        </h6>
+    <div class="flex-row">
+      <h5 class="text-gray-900 text-sm font-semibold pb-1">{@speaker}</h5>
+      <div class="w-max grid">
+        <div class="px-3.5 py-2 bg-gray-100 rounded-e-lg rounded-es-lg justify-start items-center gap-3 inline-flex">
+          <h5 class="text-gray-900 text-sm font-normal">
+            {render_slot(@inner_block)}
+          </h5>
+        </div>
+        <div class="justify-end items-center inline-flex mb-2.5">
+          <h6 class="text-gray-500 text-xs font-normal leading-4 py-1">
+            {@message_time |> Calendar.strftime("%d-%m-%Y %H:%M:%S")}
+          </h6>
+        </div>
       </div>
     </div>
     """
@@ -50,10 +52,25 @@ defmodule IgIntranetWeb.CoreComponents do
     <div class="flex justify-end">
       <div class="grid mb-2">
         <h5 class="text-right text-gray-900 text-sm font-semibold leading-snug pb-1">{@speaker}</h5>
-        <div class="px-3 py-2 bg-indigo-600 rounded-b-lg rounded-l-lg">
-          <h2 class="text-white text-sm font-normal">
-            {render_slot(@inner_block)}
-          </h2>
+        <div class="flex-row">
+          <div class="px-3 py-2 bg-indigo-600 rounded-b-lg rounded-l-lg">
+            <h2 class="text-white text-sm font-normal">
+              {render_slot(@inner_block)}
+            </h2>
+          </div>
+          <%!--TODO: Ajout des boutons de modification de message
+          <div>
+            <.link patch={~p"/intranet_conv/edit"}>
+              <div class="grid justify-items-stretch">
+                <.button class="justify-self-end">Edit</.button>
+              </div>
+            </.link>
+            <.link patch={~p"/intranet_conv/delete"}>
+              <div class="grid justify-items-stretch">
+                <.button class="justify-self-end">Delete</.button>
+              </div>
+            </.link>
+          </div> --%>
         </div>
         <div class="justify-start items-center inline-flex">
           <h3 class="text-gray-500 text-xs font-normal leading-4 py-1">
@@ -248,9 +265,9 @@ defmodule IgIntranetWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
+      <div class=" space-y-8 bg-white">
         {render_slot(@inner_block, f)}
-        <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
+        <div :for={action <- @actions} class="flex items-center justify-between gap-6">
           {render_slot(action, f)}
         </div>
       </div>

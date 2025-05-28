@@ -1,26 +1,52 @@
+<div style="display:flex; justify-content:space-between; flex-direction:row; align-items:center">
+  <.simple_form
+    id="intranet_conv-form"
+    phx-change="select"
+    for={@select_form}
+    style="width: 24rem; align-items:center;"
+  >
+    <.input
+      type="select"
+      name="current_conversation_id"
+      options={Enum.map(@conversations, &{&1.conversation_topic, &1.id})}
+      value=""
+    />
+  </.simple_form>
+
+  <.link patch={~p"/intranet_conv/new_conv"}>
+    <div class="grid justify-items-stretch">
+      <.button class="justify-self-end">{gettext("New conversation")}</.button>
+    </div>
+  </.link>
+</div>
 <.header>
-  Listing Intranet conversations
+  <%= if ((@current_conversation_id == 0) || (@current_conversation_id == "0")) do %>
+    Listing Intranet conversations <% IO.inspect(@current_conversation_id) %>
+  <% else %>
+    <% IO.inspect(@current_conversation_id) %>
+
+    {Chats.get_intranet_conversation!(@current_conversation_id).conversation_topic}
+    <.link patch={~p"/intranet_conv/edit_conv"}>
+      <div class="grid justify-items-stretch">
+        <.button class="justify-self-end">Edit</.button>
+      </div>
+    </.link>
+  <% end %>
 </.header>
-<br />
-<.link patch={~p"/intranet_conv/new"}>
-  <div class="grid justify-items-stretch">
-    <.button class="justify-self-end">{gettext("New message")}</.button>
-  </div>
-</.link>
-<.simple_form id="intranet_conv-form" phx-change="select" for={@filter_form}>
-  <.input
-    type="select"
-    label="Conversation"
-    name="current_conversation_id"
-    options={Enum.map(@conversations, &{&1.conversation_topic, &1.id})}
-    value=""
-  />
-</.simple_form>
 <br />
 <%= if ((@current_conversation_id == 0) || (@current_conversation_id == "0")) do %>
 <% else %>
+  <.live_component
+    module={IgIntranetWeb.IntranetConvLive.FormMessageComponent}
+    id={:new}
+    action={@live_action}
+    user_id={@current_user.id}
+    current_conversation_id={@current_conversation_id}
+    patch={~p"/intranet_conv"}
+  />
+  <br />
   <div class="grid">
-    <%= for message <- @intranet_messages do %>
+    <%= for message <- @messages do %>
       <.left_chat
         :if={message.user_id != @current_user.id}
         speaker={message.user.email}
@@ -41,21 +67,6 @@
 <% end %>
 
 <.modal
-  :if={@live_action == :new}
-  id="intranet_message-modal"
-  show
-  on_cancel={JS.patch(~p"/intranet_conv")}
->
-  <.live_component
-    module={IgIntranetWeb.IntranetConvLive.FormComponent}
-    id={:new}
-    action={@live_action}
-    user_id={@current_user.id}
-    patch={~p"/intranet_conv"}
-  />
-</.modal>
-
-<.modal
   :if={@live_action == :new_conv}
   id="intranet_conversation-modal"
   show
@@ -69,3 +80,19 @@
     patch={~p"/intranet_conv"}
   />
 </.modal>
+<%!-- TODO: Implémenter la modale d'edit conv
+<.modal
+  :if={@live_action == :edit_conv}
+  id="intranet_conversation-modal"
+  show
+  on_cancel={JS.patch(~p"/intranet_conv")}
+>
+  <.live_component
+    module={IgIntranetWeb.IntranetConvLive.FormEditConversationComponent}
+    id={@current_conversation_id}
+    title={@page_title}
+    action={@live_action}
+    intranet_conversation={@intranet_conversation}
+    patch={~p"/intranet_conv/edit_conv"}
+  />
+</.modal> --%>
