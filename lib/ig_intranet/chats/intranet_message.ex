@@ -14,15 +14,13 @@ defmodule IgIntranet.Chats.IntranetMessage do
 
     belongs_to(:intranet_conversation, IntranetConversation)
     belongs_to(:user, User)
-    belongs_to(:recipient, User, foreign_key: :recipient_id)
-
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(intranet_message, attrs) do
     intranet_message
-    |> cast(attrs, [:message_body, :intranet_conversation_id, :user_id, :recipient_id])
+    |> cast(attrs, [:message_body, :intranet_conversation_id, :user_id])
     |> validate_required([:message_body, :intranet_conversation_id])
   end
 
@@ -34,7 +32,7 @@ defmodule IgIntranet.Chats.IntranetMessage do
   """
   def nested_changeset(intranet_message, attrs) do
     intranet_message
-    |> cast(attrs, [:message_body, :intranet_conversation_id, :user_id, :recipient_id])
+    |> cast(attrs, [:message_body, :intranet_conversation_id, :user_id])
     |> validate_required([:message_body])
   end
 end

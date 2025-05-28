@@ -58,7 +58,6 @@ defmodule IgIntranet.Chats do
     |> order_by([conv], desc: conv.inserted_at)
     |> join(:left, [conv], message in assoc(conv, :intranet_messages))
     |> where([_conv, message], message.user_id == ^user_id)
-    |> or_where([_conv, message], message.recipient_id == ^user_id)
     |> Repo.all()
   end
 
@@ -108,6 +107,7 @@ defmodule IgIntranet.Chats do
     do:
       Repo.get!(IntranetConversation, id)
       |> Repo.preload(:intranet_messages)
+      |> Repo.preload(:users)
 
   @doc """
   Preload une conversation avec ses [%IntranetMessage{}, ...].
@@ -229,9 +229,8 @@ defmodule IgIntranet.Chats do
     IntranetMessage
     |> order_by([mess], desc: mess.inserted_at)
     |> where([im], im.user_id == ^user_id)
-    |> or_where([im], im.recipient_id == ^user_id)
     |> Repo.all()
-    |> Repo.preload([:user, :recipient])
+    |> Repo.preload([:user])
   end
 
   @doc """
@@ -259,10 +258,11 @@ defmodule IgIntranet.Chats do
     |> Repo.preload(:user)
   end
 
-  def list_intranet_message_by_conversation_id(id) do
+  def list_intranet_message_by_conversation_id_with_preload(id) do
     IntranetMessage
     |> where([m], m.intranet_conversation_id == ^id)
     |> order_by([m], desc: m.inserted_at)
+    |> preload(:user)
     |> Repo.all()
   end
 
