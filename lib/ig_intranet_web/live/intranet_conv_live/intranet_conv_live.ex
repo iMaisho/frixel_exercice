@@ -91,7 +91,6 @@ defmodule IgIntranetWeb.IntranetConvLive do
   def handle_event("select", %{"current_conversation" => id}, socket) do
     conversation =
       id
-      |> String.to_integer()
       |> Chats.get_intranet_conversation_with_preload!()
 
     {:noreply, socket |> assign(:current_conversation, conversation)}

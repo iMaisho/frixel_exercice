@@ -66,8 +66,7 @@ defmodule IgIntranetWeb.IntranetConvLive.FormMessageComponent do
          |> assign_form()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply,
-         assign(socket, form_mess: to_form(changeset)) |> push_patch(to: ~p"/intranet_conv")}
+        {:noreply, socket |> assign(form_mess: to_form(changeset))}
     end
   end
 

@@ -62,9 +62,7 @@ defmodule IgIntranet.Chats.IntranetConversation do
   end
 
   def changeset_with_users(intranet_conversation, current_user, attrs) do
-    user_id_list = Enum.map(attrs["user_list"], fn x -> String.to_integer(x) end)
-
-    user_list = [current_user | IgIntranet.Accounts.list_users_by_id(user_id_list)]
+    user_list = [current_user | IgIntranet.Accounts.list_users_by_id(attrs["user_list"])]
 
     changeset(intranet_conversation, attrs)
     |> put_assoc(:users, user_list, required: true)
