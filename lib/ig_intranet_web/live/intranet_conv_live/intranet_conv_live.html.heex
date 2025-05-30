@@ -7,8 +7,11 @@
   >
     <.input
       type="select"
-      name="current_conversation_id"
-      options={Enum.map(@conversations, &{&1.conversation_topic, &1.id})}
+      name="current_conversation"
+      options={
+        [{"Sélectionner une conversation", nil}] ++
+          Enum.map(@available_conversations, &{&1.conversation_topic, &1.id})
+      }
       value=""
     />
   </.simple_form>
@@ -19,34 +22,32 @@
     </div>
   </.link>
 </div>
-<.header>
-  <%= if ((@current_conversation_id == 0) || (@current_conversation_id == "0")) do %>
-    Listing Intranet conversations <% IO.inspect(@current_conversation_id) %>
-  <% else %>
-    <% IO.inspect(@current_conversation_id) %>
 
-    {Chats.get_intranet_conversation!(@current_conversation_id).conversation_topic}
-    <.link patch={~p"/intranet_conv/edit_conv"}>
-      <div class="grid justify-items-stretch">
-        <.button class="justify-self-end">Edit</.button>
+<%= if assigns[:current_conversation] do %>
+  <.header>
+    <div class="flex-col  mt-12">
+      <div class="justify-center">
+        {@current_conversation.conversation_topic}
       </div>
-    </.link>
-  <% end %>
-</.header>
-<br />
-<%= if ((@current_conversation_id == 0) || (@current_conversation_id == "0")) do %>
-<% else %>
+      <.link patch={~p"/intranet_conv/#{@current_conversation.id}/edit_conv"}>
+        <div>
+          <.button>Edit</.button>
+        </div>
+      </.link>
+    </div>
+  </.header>
+  <br />
   <.live_component
     module={IgIntranetWeb.IntranetConvLive.FormMessageComponent}
     id={:new}
     action={@live_action}
-    user_id={@current_user.id}
-    current_conversation_id={@current_conversation_id}
+    current_user={@current_user}
+    current_conversation={@current_conversation}
     patch={~p"/intranet_conv"}
   />
   <br />
   <div class="grid">
-    <%= for message <- @messages do %>
+    <%= for message <- @current_conversation.intranet_messages do %>
       <.left_chat
         :if={message.user_id != @current_user.id}
         speaker={message.user.email}
@@ -76,11 +77,11 @@
     module={IgIntranetWeb.IntranetConvLive.FormConversationComponent}
     id={:new_conv}
     action={@live_action}
-    user_id={@current_user.id}
+    current_user={@current_user}
     patch={~p"/intranet_conv"}
   />
 </.modal>
-<%!-- TODO: Implémenter la modale d'edit conv
+
 <.modal
   :if={@live_action == :edit_conv}
   id="intranet_conversation-modal"
@@ -89,10 +90,9 @@
 >
   <.live_component
     module={IgIntranetWeb.IntranetConvLive.FormEditConversationComponent}
-    id={@current_conversation_id}
-    title={@page_title}
+    id={@current_conversation.id}
+    current_conversation={@current_conversation}
+    patch={~p"/intranet_conv"}
     action={@live_action}
-    intranet_conversation={@intranet_conversation}
-    patch={~p"/intranet_conv/edit_conv"}
   />
-</.modal> --%>
+</.modal>

@@ -14,7 +14,12 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
         Nouveau message
       </.header>
 
-      <.simple_form for={@form_conv} id="intranet_conversation-form" phx-submit="save">
+      <.simple_form
+        for={@form_conv}
+        id="intranet_conversation-form"
+        phx-submit="save_conversation"
+        phx-target={@myself}
+      >
         <.input
           field={@form_conv[:conversation_topic]}
           label="Topic"
@@ -39,13 +44,6 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
             label="Nouveau message"
             placeholder="Démarrez votre conversation"
           />
-          <%!-- <.input
-            field={mess[:recipient_id]}
-            type="select"
-            label="Destinataire"
-            options={@users}
-            prompt="Select a user"
-          /> --%>
         </.inputs_for>
         <:actions>
           <.button phx-disable-with="Saving...">Save  message</.button>
@@ -56,12 +54,13 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
   end
 
   @impl true
-  def update(%{user_id: user_id}, socket) do
-    users = Accounts.list_users_tuple_except_user_id(user_id)
+  def update(%{current_user: current_user}, socket) do
+    users = Accounts.list_users_tuple_except_user_id(current_user.id)
 
     {:ok,
      socket
      |> assign(other_users_list: users)
+     |> assign(current_user: current_user)
      |> assign_form()}
   end
 
@@ -73,5 +72,40 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
 
     socket
     |> assign(:form_conv, form)
+  end
+
+  @impl true
+  def handle_event(
+        "save_conversation",
+        %{"intranet_conversation" => intranet_conversation_params},
+        %{assigns: %{current_user: current_user}} = socket
+      ) do
+    # on ajoute ici le user_id (créateur du message) pour éivter une manipulation malveillante dans le formulaire.
+    intranet_conversation_params
+    |> Kernel.put_in(["intranet_messages", "0", "user_id"], current_user.id)
+    |> Chats.create_intranet_conversation_with_users(current_user)
+    |> case do
+      {:ok, conversation} ->
+        first_and_only_message =
+          conversation
+          |> Chats.preload_intranet_conversation_with_message()
+          |> Map.get(:intranet_messages)
+          |> List.first()
+
+        updated_conversation =
+          first_and_only_message.intranet_conversation_id
+          |> Chats.get_intranet_conversation_with_preload!()
+
+        {:noreply,
+         socket
+         |> assign(current_conversation: updated_conversation)
+         |> put_flash(:info, "Message créé !")
+         |> push_patch(to: ~p"/intranet_conv")}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+
+        {:noreply,
+         assign(socket, form: to_form(changeset)) |> push_patch(to: ~p"/intranet_conv/new_conv")}
+    end
   end
 end

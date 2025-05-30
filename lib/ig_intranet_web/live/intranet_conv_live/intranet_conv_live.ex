@@ -2,19 +2,19 @@ defmodule IgIntranetWeb.IntranetConvLive do
   use IgIntranetWeb, :live_view
 
   alias IgIntranet.Chats
-  alias IgIntranet.Chats.IntranetMessage
 
   @impl true
   def mount(_params, _session, %{assigns: %{current_user: current_user}} = socket) do
     if connected?(socket), do: Chats.message_subscribe()
 
-    conversations = Chats.list_intranet_conversations_with_preload_by_user_id(current_user.id)
+    available_conversations =
+      Chats.list_intranet_conversations_with_preload_by_user_id(current_user.id)
 
     {:ok,
      socket
-     |> assign(conversations: conversations)
+     |> assign(available_conversations: available_conversations)
      |> assign(:select_form, %{})
-     |> assign(:current_conversation_id, 0)}
+     |> assign(:current_conversation, nil)}
   end
 
   @impl true
@@ -34,18 +34,13 @@ defmodule IgIntranetWeb.IntranetConvLive do
     socket
   end
 
-  # TODO: implémenter l'édit du topic de la conversation
-  #   defp apply_action(socket, :edit_conv, _params) do
-  #   conversation =
-  #     Chats.get_intranet_conversation!(String.to_integer(socket.assigns.current_conversation_id))
+  defp apply_action(socket, :edit_conv, %{"id" => id}) do
+    current_conversation = Chats.get_intranet_conversation_with_preload!(id)
 
-  #   socket
-  #   |> assign(:page_title, "Edit Intranet conversation")
-  #   |> assign(
-  #     :intranet_conversation,
-  #     conversation
-  #   )
-  # end
+    socket
+    |> assign(:page_title, "Edit Intranet conversation")
+    |> assign(:current_conversation, current_conversation)
+  end
 
   @impl true
   def handle_info({:message_created, message}, %{assigns: %{current_user: current_user}} = socket) do
@@ -53,81 +48,52 @@ defmodule IgIntranetWeb.IntranetConvLive do
       message =
         message |> Chats.preload_intranet_message_with_user()
 
+      updated_conversation =
+        message.intranet_conversation_id
+        |> Chats.get_intranet_conversation_with_preload!()
+
       {:noreply,
        socket
-       |> update(:messages, &[message | &1])
+       |> assign(current_conversation: updated_conversation)
        |> put_flash(:info, "Message reçu !")}
     else
       {:noreply, socket}
     end
   end
 
-  @impl true
-  def handle_event(
-        "save",
-        %{"intranet_message" => message_params},
-        %{
-          assigns: %{current_user: current_user, current_conversation_id: current_conversation_id}
-        } = socket
+  def handle_info(
+        {IgIntranetWeb.IntranetConvLive.FormEditConversationComponent, {:edited, conversation}},
+        socket
       ) do
-    message_params
-    |> Map.merge(%{
-      "user_id" => current_user.id,
-      "intranet_conversation_id" => current_conversation_id
-    })
-    |> Chats.create_intranet_message()
-    |> case do
-      {:ok, message} ->
-        {:noreply,
-         socket
-         |> update(:messages, &[message | &1])
-         |> put_flash(:info, "Message créé !")
-         |> push_patch(to: ~p"/intranet_conv")}
+    updated =
+      Chats.get_intranet_conversation_with_preload!(conversation.id)
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply,
-         assign(socket, form_mess: to_form(changeset)) |> push_patch(to: ~p"/intranet_conv")}
-    end
+    {:noreply, socket |> assign(:current_conversation, updated)}
   end
 
-  @impl true
-  def handle_event(
-        "save",
-        %{"intranet_conversation" => intranet_conversation_params},
-        %{assigns: %{current_user: current_user}} = socket
+  def handle_info(
+        {IgIntranetWeb.IntranetConvLive.FormMessageComponent, {:update_messages, message}},
+        socket
       ) do
-    # on ajoute ici le user_id (créateur du message) pour éivter une manipulation malveillante dans le formulaire.
-    intranet_conversation_params
-    |> Kernel.put_in(["intranet_messages", "0", "user_id"], current_user.id)
-    |> Chats.create_intranet_conversation_with_users(current_user)
-    |> case do
-      {:ok, conversation} ->
-        first_and_only_message =
-          conversation
-          |> Chats.preload_intranet_conversation_with_message()
-          |> Map.get(:intranet_messages)
-          |> List.first()
-
-        {:noreply,
-         socket
-         |> update(:messages, &[first_and_only_message | &1])
-         |> put_flash(:info, "Message créé !")
-         |> push_patch(to: ~p"/intranet_conv")}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply,
-         assign(socket, form: to_form(changeset)) |> push_patch(to: ~p"/intranet_conv/new_conv")}
-    end
-  end
-
-  @impl true
-  def handle_event("select", %{"current_conversation_id" => id}, socket) do
-    messages =
-      Chats.list_intranet_message_by_conversation_id_with_preload(id)
+    updated_conversation =
+      Chats.get_intranet_conversation_with_preload!(message.intranet_conversation_id)
 
     {:noreply,
      socket
-     |> assign(:messages, messages)
-     |> assign(:current_conversation_id, id)}
+     |> assign(current_conversation: updated_conversation)}
+  end
+
+  @impl true
+  def handle_event("select", %{"current_conversation" => ""}, socket) do
+    {:noreply, socket |> assign(:current_conversation, nil)}
+  end
+
+  def handle_event("select", %{"current_conversation" => id}, socket) do
+    conversation =
+      id
+      |> String.to_integer()
+      |> Chats.get_intranet_conversation_with_preload!()
+
+    {:noreply, socket |> assign(:current_conversation, conversation)}
   end
 end

@@ -7,6 +7,7 @@ defmodule IgIntranet.Chats do
   alias IgIntranet.Repo
 
   alias IgIntranet.Chats.IntranetConversation
+  alias IgIntranet.Chats.IntranetMessage
 
   @doc """
   Returns the list of intranet_conversations.
@@ -103,11 +104,16 @@ defmodule IgIntranet.Chats do
   """
   def get_intranet_conversation!(id), do: Repo.get!(IntranetConversation, id)
 
-  def get_intranet_conversation_with_preload!(id),
-    do:
-      Repo.get!(IntranetConversation, id)
-      |> Repo.preload(:intranet_messages)
-      |> Repo.preload(:users)
+  def get_intranet_conversation_with_preload!(id) do
+    Repo.get!(IntranetConversation, id)
+    |> Repo.preload([
+      :users,
+      intranet_messages: {
+        from(m in IntranetMessage, order_by: [desc: m.inserted_at]),
+        :user
+      }
+    ])
+  end
 
   @doc """
   Preload une conversation avec ses [%IntranetMessage{}, ...].

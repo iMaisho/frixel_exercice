@@ -122,6 +122,7 @@ defmodule IgIntranetWeb.Router do
       live "/intranet_conv", IntranetConvLive, :index
       live "/intranet_conv/new", IntranetConvLive, :new
       live "/intranet_conv/new_conv", IntranetConvLive, :new_conv
+      live "/intranet_conv/:id/edit_conv", IntranetConvLive, :edit_conv
     end
   end
 end
