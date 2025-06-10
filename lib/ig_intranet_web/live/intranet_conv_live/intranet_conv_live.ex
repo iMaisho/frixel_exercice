@@ -14,7 +14,8 @@ defmodule IgIntranetWeb.IntranetConvLive do
      socket
      |> assign(available_conversations: available_conversations)
      |> assign(:select_form, %{})
-     |> assign(:current_conversation, nil)}
+     |> assign(:current_conversation, nil)
+     |> assign(:message, %IgIntranet.Chats.IntranetMessage{})}
   end
 
   @impl true
@@ -43,9 +44,9 @@ defmodule IgIntranetWeb.IntranetConvLive do
   end
 
   defp apply_action(socket, :edit_mess, %{"message_id" => id}) do
-    selected_message = Chats.get_intranet_message!(id)
+    message = Chats.get_intranet_message!(id)
 
-    socket |> assign(:message, selected_message)
+    socket |> assign(:message, message)
   end
 
   defp apply_action(socket, :confirm_delete_mess, %{"message_id" => id}) do
@@ -109,7 +110,6 @@ defmodule IgIntranetWeb.IntranetConvLive do
   end
 
   def handle_event("delete_message", _params, socket) do
-    IO.inspect(socket.assigns.message)
     Chats.delete_intranet_message(socket.assigns.message)
 
     updated =

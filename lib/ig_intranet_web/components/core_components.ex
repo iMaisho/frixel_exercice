@@ -55,7 +55,7 @@ defmodule IgIntranetWeb.CoreComponents do
       <div class="grid mb-2">
         <h5 class="text-right text-gray-900 text-sm font-semibold leading-snug pb-1">{@speaker}</h5>
         <div class="flex flex-row">
-          <div class="px-3 py-2 bg-indigo-600 rounded-b-lg rounded-l-lg">
+          <div class="px-3 py-2 bg-indigo-600 rounded-b-lg rounded-l-lg mr-5">
             <h2 class="text-white text-sm font-normal">
               {render_slot(@inner_block)}
             </h2>
