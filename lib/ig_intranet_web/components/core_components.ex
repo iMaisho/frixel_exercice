@@ -16,6 +16,7 @@ defmodule IgIntranetWeb.CoreComponents do
   """
   use Phoenix.Component
   use Gettext, backend: IgIntranetWeb.Gettext
+  use Phoenix.VerifiedRoutes, endpoint: IgIntranetWeb.Endpoint, router: IgIntranetWeb.Router
 
   alias Phoenix.LiveView.JS
 
@@ -46,31 +47,29 @@ defmodule IgIntranetWeb.CoreComponents do
   attr :speaker, :string
   slot :inner_block, required: true
   attr :message_time, :any, doc: "message_time must be a %DateTime{} struct. "
+  attr :message_id, :any
 
   def right_chat(assigns) do
     ~H"""
     <div class="flex justify-end">
       <div class="grid mb-2">
         <h5 class="text-right text-gray-900 text-sm font-semibold leading-snug pb-1">{@speaker}</h5>
-        <div class="flex-row">
+        <div class="flex flex-row">
           <div class="px-3 py-2 bg-indigo-600 rounded-b-lg rounded-l-lg">
             <h2 class="text-white text-sm font-normal">
               {render_slot(@inner_block)}
             </h2>
           </div>
-          <%!--TODO: Ajout des boutons de modification de message
-          <div>
-            <.link patch={~p"/intranet_conv/edit"}>
-              <div class="grid justify-items-stretch">
-                <.button class="justify-self-end">Edit</.button>
-              </div>
-            </.link>
-            <.link patch={~p"/intranet_conv/delete"}>
-              <div class="grid justify-items-stretch">
-                <.button class="justify-self-end">Delete</.button>
-              </div>
-            </.link>
-          </div> --%>
+          <.link patch={~p"/intranet_conv/#{@message_id}/edit_mess"}>
+            <div class="grid justify-items-stretch">
+              <.button class="justify-self-end">Edit</.button>
+            </div>
+          </.link>
+          <.link patch={~p"/intranet_conv/#{@message_id}/confirm_delete_mess"}>
+            <div class="grid justify-items-stretch">
+              <.button class="justify-self-end">Delete</.button>
+            </div>
+          </.link>
         </div>
         <div class="justify-start items-center inline-flex">
           <h3 class="text-gray-500 text-xs font-normal leading-4 py-1">

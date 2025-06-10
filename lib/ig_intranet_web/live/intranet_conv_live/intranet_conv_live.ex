@@ -42,6 +42,18 @@ defmodule IgIntranetWeb.IntranetConvLive do
     |> assign(:current_conversation, current_conversation)
   end
 
+  defp apply_action(socket, :edit_mess, %{"message_id" => id}) do
+    selected_message = Chats.get_intranet_message!(id)
+
+    socket |> assign(:message, selected_message)
+  end
+
+  defp apply_action(socket, :confirm_delete_mess, %{"message_id" => id}) do
+    selected_message = Chats.get_intranet_message!(id)
+
+    socket |> assign(:message, selected_message)
+  end
+
   @impl true
   def handle_info({:message_created, message}, %{assigns: %{current_user: current_user}} = socket) do
     if current_user.id != message.user_id do
@@ -94,5 +106,21 @@ defmodule IgIntranetWeb.IntranetConvLive do
       |> Chats.get_intranet_conversation_with_preload!()
 
     {:noreply, socket |> assign(:current_conversation, conversation)}
+  end
+
+  def handle_event("delete_message", _params, socket) do
+    IO.inspect(socket.assigns.message)
+    Chats.delete_intranet_message(socket.assigns.message)
+
+    updated =
+      Chats.get_intranet_conversation_with_preload!(
+        socket.assigns.message.intranet_conversation_id
+      )
+
+    {:noreply,
+     socket
+     |> assign(:current_conversation, updated)
+     |> push_patch(to: ~p"/intranet_conv")
+     |> put_flash(:info, "Message supprimé !")}
   end
 end

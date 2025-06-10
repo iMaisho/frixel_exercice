@@ -197,12 +197,13 @@ defmodule IgIntranet.Chats do
     IntranetConversation.changeset(intranet_conversation, attrs)
   end
 
-  def change_intranet_conversation_with_users(
-        %IntranetConversation{} = intranet_conversation,
-        attrs \\ %{}
-      ) do
-    IntranetConversation.changeset_with_users(intranet_conversation, attrs)
-  end
+  # TODO: Implémentation incorrecte, mais ne semble pas être utilisée pour l'instant ?
+  # def change_intranet_conversation_with_users(
+  #       %IntranetConversation{} = intranet_conversation,
+  #       attrs \\ %{}
+  #     ) do
+  #   IntranetConversation.changeset_with_users(intranet_conversation, attrs)
+  # end
 
   def preload_intranet_messages(intranet_conversation) do
     Repo.preload(intranet_conversation, :intranet_messages)

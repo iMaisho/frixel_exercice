@@ -60,6 +60,7 @@
         :if={message.user_id == @current_user.id}
         speaker="You"
         message_time={message.inserted_at}
+        message_id={message.id}
       >
         {message.message_body}
       </.right_chat>
@@ -95,4 +96,24 @@
     patch={~p"/intranet_conv"}
     action={@live_action}
   />
+</.modal>
+
+<.modal
+  :if={@live_action == :confirm_delete_mess}
+  id="confirm_delete_message_modal"
+  show
+  on_cancel={JS.patch(~p"/intranet_conv")}
+>
+  <div class="flex-row">
+    <h1>{@message.message_body}</h1>
+    <h1>_______________</h1>
+    <h2>{gettext("Are you sure you want to delete this message ?")}</h2>
+    <p>{gettext("This action cannot be undone")}</p>
+    <div class="flex-col">
+      <.button class="bg-red-700" phx-click="delete_message">{gettext("Delete")}</.button>
+      <.link patch={~p"/intranet_conv/"}>
+        <.button>{gettext("Cancel")}</.button>
+      </.link>
+    </div>
+  </div>
 </.modal>
