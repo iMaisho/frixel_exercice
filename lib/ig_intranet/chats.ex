@@ -5,8 +5,6 @@ defmodule IgIntranet.Chats do
 
   import Ecto.Query, warn: false
   alias Ecto.Multi
-  alias ElixirSense.Log
-  alias IgIntranet.ApplicationActivity
   alias IgIntranet.Repo
 
   alias IgIntranet.Chats.IntranetConversation
@@ -439,5 +437,9 @@ defmodule IgIntranet.Chats do
   defp message_broadcast({:ok, message}, event) do
     Phoenix.PubSub.broadcast(IgIntranet.PubSub, "messages", {event, message})
     {:ok, message}
+  end
+
+  def get_log_list(params) do
+    Log |> Flop.validate_and_run(params, for: Log, replace_invalid_params: true)
   end
 end

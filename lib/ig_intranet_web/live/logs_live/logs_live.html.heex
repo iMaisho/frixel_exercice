@@ -1,0 +1,27 @@
+<.header>
+  Logs
+</.header>
+
+<div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
+  <Flop.Phoenix.table
+    items={@streams.logs}
+    meta={@meta}
+    path={~p"/admin/logs"}
+    opts={IgIntranetWeb.Components.FlopConfig.table_opts()}
+  >
+    <:col :let={{_id, log}} field={:inserted_at} label="Date création" col_style="width: 20%">
+      {log.inserted_at |> Calendar.strftime("%d-%m-%Y %H:%M:%S")}
+    </:col>
+    <:col :let={{_id, log}} field={:log_event} label={gettext("Event")}>
+      {log.log_event}
+    </:col>
+    <:col :let={{_id, log}} field={:event_generator} label="Generator">
+      {log.event_generator}
+    </:col>
+  </Flop.Phoenix.table>
+  <Flop.Phoenix.pagination
+    meta={@meta}
+    path={~p"/admin/logs"}
+    opts={IgIntranetWeb.Components.FlopConfig.pagination_opts()}
+  />
+</div>
