@@ -83,29 +83,26 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
     # on ajoute ici le user_id (créateur du message) pour éivter une manipulation malveillante dans le formulaire.
     intranet_conversation_params
     |> Kernel.put_in(["intranet_messages", "0", "user_id"], current_user.id)
-    |> Chats.create_intranet_conversation_with_users(current_user)
+    |> Chats.create_intranet_conversation_with_users_with_log(current_user)
     |> case do
-      {:ok, conversation} ->
-        first_and_only_message =
-          conversation
-          |> Chats.preload_intranet_conversation_with_message()
-          |> Map.get(:intranet_messages)
-          |> List.first()
-
+      {:ok, %{log: _log, conversation: conversation}} ->
         updated_conversation =
-          first_and_only_message.intranet_conversation_id
+          conversation.id
           |> Chats.get_intranet_conversation_with_preload!()
 
         {:noreply,
          socket
          |> assign(current_conversation: updated_conversation)
-         |> put_flash(:info, "Message créé !")
+         |> put_flash(:info, "Conversation créée !")
          |> push_patch(to: ~p"/intranet_conv")}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-
-        {:noreply,
-         assign(socket, form: to_form(changeset)) |> push_patch(to: ~p"/intranet_conv/new_conv")}
+      {:error, _name, changeset} ->
+        {
+          :noreply,
+          assign(socket, form: to_form(changeset))
+          |> push_patch(to: ~p"/intranet_conv/new_conv")
+          |> put_flash(:error_handler, "There has been an error")
+        }
     end
   end
 end

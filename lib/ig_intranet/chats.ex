@@ -4,10 +4,14 @@ defmodule IgIntranet.Chats do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Multi
+  alias ElixirSense.Log
+  alias IgIntranet.ApplicationActivity
   alias IgIntranet.Repo
 
   alias IgIntranet.Chats.IntranetConversation
   alias IgIntranet.Chats.IntranetMessage
+  alias IgIntranet.ApplicationActivity.Log
 
   @doc """
   Returns the list of intranet_conversations.
@@ -148,6 +152,25 @@ defmodule IgIntranet.Chats do
     %IntranetConversation{}
     |> IntranetConversation.changeset_with_users(current_user, attrs)
     |> Repo.insert()
+  end
+
+  def create_intranet_conversation_with_users_with_log(attrs, current_user) do
+    Multi.new()
+    |> Multi.insert(
+      :conversation,
+      IntranetConversation.changeset_with_users(%IntranetConversation{}, current_user, attrs)
+    )
+    |> Multi.insert(
+      :log,
+      Log.log_changeset(
+        %Log{},
+        %{
+          log_event: "conversation_created",
+          event_generator: current_user.email
+        }
+      )
+    )
+    |> Repo.transaction()
   end
 
   @doc """
