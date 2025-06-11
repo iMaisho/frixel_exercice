@@ -13,7 +13,6 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
       <.header>
         Nouveau message
       </.header>
-
       <.simple_form
         for={@form_conv}
         id="intranet_conversation-form"
@@ -96,12 +95,12 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
          |> put_flash(:info, "Conversation créée !")
          |> push_patch(to: ~p"/intranet_conv")}
 
-      {:error, _name, changeset} ->
+      {:error, _name, changeset, _idkwtfisthis} ->
         {
           :noreply,
-          assign(socket, form: to_form(changeset))
+          assign(socket, form_conv: to_form(changeset))
+          |> put_flash(:error, "There has been an error")
           |> push_patch(to: ~p"/intranet_conv/new_conv")
-          |> put_flash(:error_handler, "There has been an error")
         }
     end
   end
