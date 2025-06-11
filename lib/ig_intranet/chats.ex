@@ -168,6 +168,16 @@ defmodule IgIntranet.Chats do
     |> Repo.update()
   end
 
+  def update_intranet_conversation_with_users(
+        %IntranetConversation{} = intranet_conversation,
+        user,
+        attrs
+      ) do
+    intranet_conversation
+    |> IntranetConversation.changeset_with_users(user, attrs)
+    |> Repo.update()
+  end
+
   @doc """
   Deletes a intranet_conversation.
 
