@@ -11,6 +11,7 @@ defmodule IgIntranet.Chats.IntranetMessage do
 
   schema "intranet_messages" do
     field :message_body, :string
+    field :meta_data, :map
 
     belongs_to(:intranet_conversation, IntranetConversation)
     belongs_to(:user, User)
