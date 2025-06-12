@@ -13,6 +13,9 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
       <.header>
         Nouveau message
       </.header>
+      <div class="alert alert-danger" role="alert" phx-click="lv:clear-flash" phx-value-key="error">
+        {live_flash(@flash, :error)}
+      </div>
       <.simple_form
         for={@form_conv}
         id="intranet_conversation-form"
@@ -42,6 +45,7 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
             type="text"
             label="Nouveau message"
             placeholder="Démarrez votre conversation"
+            required
           />
         </.inputs_for>
         <:actions>
@@ -100,7 +104,6 @@ defmodule IgIntranetWeb.IntranetConvLive.FormConversationComponent do
           :noreply,
           assign(socket, form_conv: to_form(changeset))
           |> put_flash(:error, "There has been an error")
-          |> push_patch(to: ~p"/intranet_conv/new_conv")
         }
     end
   end

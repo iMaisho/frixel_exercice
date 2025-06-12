@@ -60,15 +60,29 @@ defmodule IgIntranet.Chats.IntranetConversation do
   def changeset(intranet_conversation, attrs) do
     intranet_conversation
     |> cast(attrs, [:conversation_type, :conversation_status, :conversation_topic, :user_list])
-    |> cast_assoc(:intranet_messages, with: &IgIntranet.Chats.IntranetMessage.nested_changeset/2)
+    |> cast_assoc(:intranet_messages,
+      with: &IgIntranet.Chats.IntranetMessage.nested_changeset/2,
+      required: true
+    )
     |> validate_required([:conversation_type, :conversation_status, :conversation_topic])
     |> unique_constraint(:conversation_topic)
   end
 
   def changeset_with_users(intranet_conversation, current_user, attrs) do
-    user_list = [current_user | IgIntranet.Accounts.list_users_by_id(attrs["user_list"])]
+    user_list =
+      case attrs["user_list"] do
+        nil -> []
+        ids -> [current_user | IgIntranet.Accounts.list_users_by_id(ids)]
+      end
 
-    changeset(intranet_conversation, attrs)
-    |> put_assoc(:users, user_list, required: true)
+    intranet_conversation
+    |> changeset(attrs)
+    |> put_assoc(:users, user_list)
+    |> validate_users_present(user_list)
   end
+
+  defp validate_users_present(changeset, []),
+    do: add_error(changeset, :users, "must not be empty")
+
+  defp validate_users_present(changeset, _), do: changeset
 end
