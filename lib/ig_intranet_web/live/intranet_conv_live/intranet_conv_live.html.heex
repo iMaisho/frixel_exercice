@@ -90,7 +90,6 @@
   show
   on_cancel={JS.patch(~p"/intranet_conv")}
 >
-  <% IO.inspect(@current_conversation.id) %>
   <.live_component
     module={IgIntranetWeb.IntranetConvLive.FormEditConversationComponent}
     id="whatever"

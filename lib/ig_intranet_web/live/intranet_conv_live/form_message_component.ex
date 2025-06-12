@@ -1,5 +1,4 @@
 defmodule IgIntranetWeb.IntranetConvLive.FormMessageComponent do
-  alias IgIntranet.Chats.IntranetMessage
   use IgIntranetWeb, :live_component
 
   alias IgIntranet.Accounts
@@ -48,7 +47,6 @@ defmodule IgIntranetWeb.IntranetConvLive.FormMessageComponent do
 
   @impl true
   def handle_event("save_message", %{"intranet_message" => message_params}, socket) do
-    IO.inspect(socket.assigns.action)
     save_message(socket, socket.assigns.action, message_params)
   end
 
