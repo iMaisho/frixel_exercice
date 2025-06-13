@@ -31,6 +31,16 @@ defmodule IgIntranet.Accounts do
     |> Repo.all()
   end
 
+  def list_users_tuple_except_user_id_by_mention(user_id, mention) do
+    mention = "%#{mention}%"
+
+    User
+    |> select([user], {user.email, user.id})
+    |> where([user], user.id != ^user_id)
+    |> where([user], ilike(user.email, ^mention))
+    |> Repo.all()
+  end
+
   @doc """
   Gets a user by email.
 

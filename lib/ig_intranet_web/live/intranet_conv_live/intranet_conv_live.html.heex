@@ -34,6 +34,11 @@
           <.button>Edit</.button>
         </div>
       </.link>
+      <%!-- <.link patch={~p"/intranet_conv/upload"}>
+        <div>
+          <.button>Send a file</.button>
+        </div>
+      </.link> --%>
     </div>
   </.header>
   <br />
@@ -64,6 +69,18 @@
         message_id={message.id}
       >
         {message.message_body}
+
+        <%= case message.meta_data do %>
+          <% nil -> %>
+          <% _ -> %>
+            <div>
+              <span :for={reaction <- message.meta_data.reactions}>
+                <span title={"User #{reaction.user_id} reacted"}>
+                  {reaction.emoji}
+                </span>
+              </span>
+            </div>
+        <% end %>
       </.right_chat>
     <% end %>
   </div>
@@ -119,3 +136,20 @@
     </div>
   </div>
 </.modal>
+
+<%!-- <.modal
+  :if={@live_action == :upload}
+  id="upload_file_modal"
+  show
+  on_cancel={JS.patch(~p"/intranet_conv")}
+>
+  <.live_component
+    module={IgIntranetWeb.IntranetConvLive.FormUploadComponent}
+    id={:new}
+    action={@live_action}
+    current_user={@current_user}
+    current_conversation={@current_conversation}
+    message={@message}
+    multipart
+  />
+</.modal> --%>
