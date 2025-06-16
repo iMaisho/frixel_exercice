@@ -9,6 +9,7 @@ defmodule IgIntranet.Chats do
 
   alias IgIntranet.Chats.IntranetConversation
   alias IgIntranet.Chats.IntranetMessage
+  alias IgIntranet.Chats.Upload
   alias IgIntranet.ApplicationActivity.Log
 
   @doc """
@@ -143,6 +144,12 @@ defmodule IgIntranet.Chats do
   def create_intranet_conversation(attrs \\ %{}) do
     %IntranetConversation{}
     |> IntranetConversation.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def create_upload(attrs \\ %{}) do
+    %Upload{}
+    |> Upload.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -422,6 +429,10 @@ defmodule IgIntranet.Chats do
   """
   def change_intranet_message(%IntranetMessage{} = intranet_message, attrs \\ %{}) do
     IntranetMessage.changeset(intranet_message, attrs)
+  end
+
+  def change_upload(%Upload{} = file, attrs \\ %{}) do
+    Upload.changeset(file, attrs)
   end
 
   def preload_intranet_conversation(intranet_message) do

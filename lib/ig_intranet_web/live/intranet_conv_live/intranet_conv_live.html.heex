@@ -21,6 +21,12 @@
       <.button class="justify-self-end">{gettext("New conversation")}</.button>
     </div>
   </.link>
+
+  <.link patch={~p"/intranet_conv/upload"}>
+    <div>
+      <.button>Upload a file</.button>
+    </div>
+  </.link>
 </div>
 
 <%= if @current_conversation do %>
@@ -34,11 +40,6 @@
           <.button>Edit</.button>
         </div>
       </.link>
-      <%!-- <.link patch={~p"/intranet_conv/upload"}>
-        <div>
-          <.button>Send a file</.button>
-        </div>
-      </.link> --%>
     </div>
   </.header>
   <br />
@@ -136,20 +137,3 @@
     </div>
   </div>
 </.modal>
-
-<%!-- <.modal
-  :if={@live_action == :upload}
-  id="upload_file_modal"
-  show
-  on_cancel={JS.patch(~p"/intranet_conv")}
->
-  <.live_component
-    module={IgIntranetWeb.IntranetConvLive.FormUploadComponent}
-    id={:new}
-    action={@live_action}
-    current_user={@current_user}
-    current_conversation={@current_conversation}
-    message={@message}
-    multipart
-  />
-</.modal> --%>

@@ -55,6 +55,10 @@ defmodule IgIntranetWeb.IntranetConvLive do
     socket |> assign(:message, selected_message)
   end
 
+  defp apply_action(socket, :upload, _params) do
+    socket
+  end
+
   @impl true
   def handle_info({:message_created, message}, %{assigns: %{current_user: current_user}} = socket) do
     if current_user.id != message.user_id do
@@ -122,5 +126,9 @@ defmodule IgIntranetWeb.IntranetConvLive do
      |> assign(:current_conversation, updated)
      |> push_patch(to: ~p"/intranet_conv")
      |> put_flash(:info, "Message supprimé !")}
+  end
+
+  def create(_conn, %{"upload" => upload_params}) do
+    IO.inspect(upload_params)
   end
 end

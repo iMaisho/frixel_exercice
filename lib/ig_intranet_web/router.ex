@@ -129,6 +129,8 @@ defmodule IgIntranetWeb.Router do
            IntranetConvLive,
            :confirm_delete_mess
 
+      live "/intranet_conv/upload", UploadLive, :index
+
       # Route des backlogs admin
       live "/admin/logs", LogsLive, :index
     end

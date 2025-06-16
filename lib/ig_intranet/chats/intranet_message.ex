@@ -51,14 +51,12 @@ defmodule IgIntranet.Chats.MessageMetadata do
     field :url_meta, {:array, :string}
     field :mentions_meta, {:array, :string}
     embeds_many :reactions, MessageReaction
-    embeds_many :uploads, Upload
   end
 
   def changeset(metadata, attrs) do
     metadata
     |> cast(attrs, [:url_meta, :mentions_meta])
     |> cast_embed(:reactions)
-    |> cast_embed(:uploads)
   end
 end
 
@@ -79,22 +77,5 @@ defmodule IgIntranet.Chats.MessageReaction do
     |> cast(attrs, [:emoji, :user_id])
     |> validate_required([:emoji, :user_id])
     |> validate_inclusion(:emoji, @allowed_emojis)
-  end
-end
-
-defmodule IgIntranet.Chats.Upload do
-  use Ecto.Schema
-  import Ecto.Changeset
-
-  @primary_key false
-  embedded_schema do
-    field :name, :string
-    field :path, :string
-  end
-
-  def changeset(upload, attrs) do
-    upload
-    |> cast(attrs, [:name, :path])
-    |> validate_required([])
   end
 end
