@@ -9,22 +9,59 @@ defmodule IgIntranetWeb.IntranetConvLive.FormMessageComponent do
   def render(assigns) do
     ~H"""
     <div>
-      <.simple_form
-        for={@form_mess}
-        id="intranet_message-form"
-        phx-change="check_body"
-        phx-submit="save_message"
-        phx-target={@myself}
-      >
-        <.input field={@form_mess[:message_body]} type="text" placeholder="Send a message here" />
-        <.input
-          :if={@arobase?}
-          field={@form_mess[:user_list]}
-          type="select"
-          prompt="Send a message here"
-          options={@arobase_users}
-        />
-      </.simple_form>
+      <div class="flex-row">
+        <.simple_form
+          for={@form_mess}
+          id="intranet_message_form"
+          phx-change="check_body"
+          phx-submit="save_message"
+          phx-target={@myself}
+        >
+          <.input
+            field={@form_mess[:message_body]}
+            type="text"
+            placeholder="Send a message here"
+            class="basis-128"
+          />
+          <.input
+            :if={@arobase?}
+            field={@form_mess[:user_list]}
+            type="select"
+            prompt="Mention a user"
+            options={@arobase_users}
+          />
+          <div class="flex">
+            <div class="relative w-[30px] h-[30px] cursor-pointer">
+              <.live_file_input
+                upload={@uploads.file}
+                class="absolute top-0 left-0 z-2 w-full h-full opacity-0"
+              />
+              <img
+                src="/images/trombone.svg"
+                class="absolute top-0 left-0 z-1 w-full h-full pointer-events-none"
+              />
+            </div>
+            <ul>
+              <%= for entry <- @uploads.file.entries do %>
+                <li>
+                  {entry.client_name}
+                  <button
+                    type="button"
+                    phx-click="cancel_upload"
+                    phx-value-ref={entry.ref}
+                    data-phx-upload-ref={entry.ref}
+                    phx-target={@myself}
+                  >
+                    Cancel
+                  </button>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+
+          <.button class="basis-128">Send</.button>
+        </.simple_form>
+      </div>
     </div>
     """
   end
@@ -45,14 +82,16 @@ defmodule IgIntranetWeb.IntranetConvLive.FormMessageComponent do
 
     {:ok,
      socket
-     |> assign(available_conversations: available_conversations)
      |> assign(users: users)
+     |> assign(available_conversations: available_conversations)
      |> assign(current_conversation: current_conversation)
      |> assign(current_user: current_user)
      |> assign(message: message)
      |> assign(action: action)
      |> assign(arobase?: false)
      |> assign(arobase_users: users)
+     |> assign(:uploaded_files, [])
+     |> allow_upload(:file, accept: ~w(.jpg .jpeg .png), max_entries: 1)
      |> assign_form()}
   end
 
@@ -99,6 +138,15 @@ defmodule IgIntranetWeb.IntranetConvLive.FormMessageComponent do
     save_message(socket, socket.assigns.action, message_params)
   end
 
+  @impl true
+  def handle_event("cancel_upload", %{"ref" => ref}, socket) do
+    {:noreply, socket |> cancel_upload(:file, ref)}
+  end
+
+  def handle_event("validate", _params, socket) do
+    {:noreply, socket}
+  end
+
   defp save_message(
          %{
            assigns: %{message: message}
@@ -129,18 +177,39 @@ defmodule IgIntranetWeb.IntranetConvLive.FormMessageComponent do
 
   defp save_message(
          %{
-           assigns: %{current_user: current_user, current_conversation: current_conversation}
+           assigns: %{
+             current_user: current_user,
+             current_conversation: current_conversation
+           }
          } = socket,
          :index,
          message_params
        ) do
-    message_params
-    |> Map.merge(%{
-      "user_id" => current_user.id,
-      "intranet_conversation_id" => current_conversation.id
-    })
-    |> Chats.create_intranet_message()
-    |> case do
+    [{path, name} | _rest] =
+      consume_uploaded_entries(socket, :file, fn %{path: path}, entry ->
+        name = Path.basename(path)
+
+        dest =
+          Path.join(Application.app_dir(:ig_intranet, "priv/static/uploads"), name)
+
+        # You will need to create `priv/static/uploads` for `File.cp!/2` to work.
+        File.cp!(path, dest)
+
+        # {:ok, %{path: dest, name: entry.client_name}}
+        {:ok, {~p"/uploads/#{Path.basename(dest)}", entry.client_name}}
+      end)
+
+    attrs = %{path: path, name: name}
+
+    message_params =
+      message_params
+      |> Map.merge(%{
+        "user_id" => current_user.id,
+        "intranet_conversation_id" => current_conversation.id,
+        "meta_data" => %{"uploaded_file" => attrs}
+      })
+
+    case Chats.create_intranet_message(message_params) do
       {:ok, message} ->
         updated_conversation =
           message.intranet_conversation_id
@@ -155,7 +224,7 @@ defmodule IgIntranetWeb.IntranetConvLive.FormMessageComponent do
          |> reset_form()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, socket |> assign(form_mess: to_form(changeset))}
+        {:noreply, assign(socket, form_mess: to_form(changeset))}
     end
   end
 
@@ -180,4 +249,8 @@ defmodule IgIntranetWeb.IntranetConvLive.FormMessageComponent do
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
+
+  defp error_to_string(:too_large), do: "Too large"
+  defp error_to_string(:too_many_files), do: "You have selected too many files"
+  defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
 end

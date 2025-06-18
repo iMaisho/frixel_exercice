@@ -12,6 +12,7 @@ defmodule IgIntranetWeb.IntranetConvLive do
 
     {:ok,
      socket
+     |> assign(:temp_file, %{name: "No file uploaded"})
      |> assign(available_conversations: available_conversations)
      |> assign(:select_form, %{})
      |> assign(:current_conversation, nil)
@@ -28,7 +29,8 @@ defmodule IgIntranetWeb.IntranetConvLive do
   end
 
   defp apply_action(socket, :new, _params) do
-    socket
+    message = %IgIntranet.Chats.IntranetMessage{}
+    socket |> assign(:message, message)
   end
 
   defp apply_action(socket, :new_conv, _params) do
@@ -100,6 +102,13 @@ defmodule IgIntranetWeb.IntranetConvLive do
      |> assign(current_conversation: updated_conversation)}
   end
 
+  def handle_info(
+        {:temp_file, temp_file},
+        socket
+      ) do
+    {:noreply, socket |> assign(temp_file: temp_file)}
+  end
+
   @impl true
   def handle_event("select", %{"current_conversation" => ""}, socket) do
     {:noreply, socket |> assign(:current_conversation, nil)}
@@ -128,7 +137,5 @@ defmodule IgIntranetWeb.IntranetConvLive do
      |> put_flash(:info, "Message supprimé !")}
   end
 
-  def create(_conn, %{"upload" => upload_params}) do
-    IO.inspect(upload_params)
-  end
+
 end

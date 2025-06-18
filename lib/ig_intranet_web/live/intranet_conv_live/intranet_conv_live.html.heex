@@ -21,12 +21,6 @@
       <.button class="justify-self-end">{gettext("New conversation")}</.button>
     </div>
   </.link>
-
-  <.link patch={~p"/intranet_conv/upload"}>
-    <div>
-      <.button>Upload a file</.button>
-    </div>
-  </.link>
 </div>
 
 <%= if @current_conversation do %>
@@ -45,12 +39,13 @@
   <br />
   <.live_component
     module={IgIntranetWeb.IntranetConvLive.FormMessageComponent}
-    id={:new}
+    id="intranet_message_form"
     action={@live_action}
     current_user={@current_user}
     current_conversation={@current_conversation}
-    patch={~p"/intranet_conv"}
     message={@message}
+    temp_file={@temp_file}
+    patch={~p"/intranet_conv"}
   />
   <br />
   <div class="grid">
@@ -61,6 +56,12 @@
         message_time={message.inserted_at}
       >
         {message.message_body}
+        <%= if message.meta_data && message.meta_data.uploaded_file do %>
+          <img
+            src={message.meta_data.uploaded_file.path}
+            alt={message.meta_data.uploaded_file.name}
+          />
+        <% end %>
       </.left_chat>
 
       <.right_chat
@@ -71,16 +72,20 @@
       >
         {message.message_body}
 
-        <%= case message.meta_data do %>
-          <% nil -> %>
-          <% _ -> %>
-            <div>
-              <span :for={reaction <- message.meta_data.reactions}>
-                <span title={"User #{reaction.user_id} reacted"}>
-                  {reaction.emoji}
-                </span>
+        <%= if message.meta_data && message.meta_data.uploaded_file do %>
+          <img
+            height="100"
+            src={message.meta_data.uploaded_file.path}
+            alt={message.meta_data.uploaded_file.name}
+          />
+
+          <div>
+            <span :for={reaction <- message.meta_data.reactions}>
+              <span title={"User #{reaction.user_id} reacted"}>
+                {reaction.emoji}
               </span>
-            </div>
+            </span>
+          </div>
         <% end %>
       </.right_chat>
     <% end %>

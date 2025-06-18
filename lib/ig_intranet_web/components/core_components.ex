@@ -34,6 +34,7 @@ defmodule IgIntranetWeb.CoreComponents do
             {render_slot(@inner_block)}
           </h5>
         </div>
+
         <div class="justify-end items-center inline-flex mb-2.5">
           <h6 class="text-gray-500 text-xs font-normal leading-4 py-1">
             {@message_time |> Calendar.strftime("%d-%m-%Y %H:%M:%S")}

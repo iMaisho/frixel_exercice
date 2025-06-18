@@ -9,7 +9,7 @@ defmodule IgIntranetWeb.UploadLive do
     <% end %>
     <form id="upload-form" phx-submit="save" phx-change="validate">
       <.live_file_input upload={@uploads.file} />
-      <button type="submit">Upload</button>
+      <button type="submit">Validate</button>
     </form>
     <ul>
       <%= for entry <- @uploads.file.entries do %>
@@ -17,7 +17,7 @@ defmodule IgIntranetWeb.UploadLive do
           {entry.client_name}
           <button
             type="button"
-            phx-click="cancel-upload"
+            phx-click="cancel_upload"
             phx-value-ref={entry.ref}
             data-phx-upload-ref={entry.ref}
           >
@@ -39,19 +39,16 @@ defmodule IgIntranetWeb.UploadLive do
 
   @impl Phoenix.LiveView
   def handle_event("validate", params, socket) do
-    IO.inspect(params)
     {:noreply, socket}
   end
 
   @impl Phoenix.LiveView
-  def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+  def handle_event("cancel_upload", %{"ref" => ref}, socket) do
     {:noreply, cancel_upload(socket, :file, ref)}
   end
 
   @impl Phoenix.LiveView
   def handle_event("save", _params, socket) do
-    IO.inspect(socket.assigns)
-
     uploaded_files =
       consume_uploaded_entries(socket, :file, fn %{path: path}, _entry ->
         name = Path.basename(path)
@@ -62,7 +59,6 @@ defmodule IgIntranetWeb.UploadLive do
         # You will need to create `priv/static/uploads` for `File.cp!/2` to work.
         case File.cp!(path, dest) do
           :ok ->
-            IO.inspect(dest)
             attrs = %{name: name, path: dest}
 
             IgIntranet.Chats.create_upload(attrs)
